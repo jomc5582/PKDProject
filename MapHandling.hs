@@ -39,6 +39,11 @@ printMap (r:ows, h)
      print r
      printMap (ows, h)
 
+-- TODO MAKE PRINTMAP ONLY PRINT WHAT IS WITHIN VISION
+
+{- editMap Map x y c
+
+-}
 editMap :: Map -> Int -> Int -> Char -> Map
 editMap ([], h) _ _ _      = ([], h)
 editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 (2 * x) y obj
@@ -46,9 +51,9 @@ editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 (2 * x) y obj
 editMapAux :: Map -> Map -> Int -> Int -> Int -> Char -> Map
 editMapAux ([], _)   new y x0 y0 obj = new
 editMapAux (o:ld, h) new y x0 y0 obj
-  | y == y0    = (editMapWidth o obj x0 : newMap, h)
-  | otherwise  = editMapAux (ld, h) (o:newMap, h) (y - 1) x0 y0 obj
-  where newMap = fst new
+  | y == y0    = (newMap ++ [editMapWidth o obj x0] ++ ld , h)
+  | otherwise  = editMapAux (ld, h) (newMap ++ [o], h) (y + 1) x0 y0 obj
+  where newMap = fst new 
 
 editMapWidth :: MapRow -> Char -> Int -> MapRow
 editMapWidth []     obj _ = []
