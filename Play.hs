@@ -1,4 +1,23 @@
-import MapHandling ()
+import MapHandling as MH
+import Creature as C
+
+{- MapInit width height
+
+-}
+mapInit :: Int -> Int -> MH.Map
+mapInit = MH.newMap
+
+{- printMap xPos yPos radius
+
+-}
+printMap :: MH.Map -> Int -> Int -> Int -> IO ()
+printMap = MH.printSection 
+
+{- printFullMap
+
+-}
+printFullMap :: MH.Map -> IO ()
+printFullMap = MH.printMap
 
 splash :: IO ()
 splash = do

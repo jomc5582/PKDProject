@@ -1,5 +1,8 @@
 module MapHandling where
 
+-- Tre i rad
+-- Sänka skäpp
+
 {-
 MAYBE MAKE INTO ARRAY INSTEAD OF LIST
 MUTABLE QUALITY WOULD MAKE IT MORE 
@@ -15,7 +18,7 @@ type Map = (MapPart, Int)
    
    EXAMPLE: 
    VARIANT: 
-
+-- TODO REMAKE USING TEXAS RANGES
 -}
 newMap :: Int -> Int -> Map
 newMap w h            = (newMapHeight (newMapWidth w) h, h)
@@ -39,26 +42,45 @@ printMap (r:ows, h)
      print r
      printMap (ows, h)
 
--- TODO MAKE PRINTMAP ONLY PRINT WHAT IS WITHIN VISION
+
+{- printSection map x y radius
+
+-}
+printSection :: Map -> Int -> Int -> Int -> IO ()
+printSection map = printSectionAux map 0
+
+{- printSectionAux map acc x y radius
+
+-}
+printSectionAux :: Map -> Int -> Int -> Int -> Int -> IO ()
+printSectionAux ([], h)   i x y r = putStrLn ""
+printSectionAux (m:ap, h) i x y r
+  | i <= y - r - 1 = printSectionAux (ap, h) (i+1) x y r
+  | i >= y + r + 1 = putStrLn ""
+  | otherwise      = do
+      print (' ' : take (4*r+1) (drop (2*x-2*r-1) m) ++ " ")
+      printSectionAux (ap, h) (i+1) x y r
 
 {- editMap Map x y c
 
 -}
 editMap :: Map -> Int -> Int -> Char -> Map
 editMap ([], h) _ _ _      = ([], h)
-editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 ((2 * x) + 1) y obj
+editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 (2 * x + 1) y obj
 
 editMapAux :: Map -> Map -> Int -> Int -> Int -> Char -> Map
 editMapAux ([], _)   new y x0 y0 obj = new
 editMapAux (o:ld, h) new y x0 y0 obj
   | y == y0    = (newMap ++ [editMapWidth o obj x0] ++ ld , h)
   | otherwise  = editMapAux (ld, h) (newMap ++ [o], h) (y + 1) x0 y0 obj
-  where newMap = fst new 
+  where newMap = fst new
 
+-- TODO EDIT TO "TAKE / DROP FUNCTION"
 editMapWidth :: MapRow -> Char -> Int -> MapRow
 editMapWidth []     obj _ = []
 editMapWidth (m:ap) obj 0 = obj : ap
 editMapWidth (m:ap) obj w = m : editMapWidth ap obj (w - 1)
 
---addMapRow
-
+readMap :: Map -> Int -> Int -> Char
+readMap ([], h)   x y = ' '
+readMap (map, h) x y = map !! max 0 y !! max 0 (2*x+1)
