@@ -46,7 +46,7 @@ printMap (r:ows, h)
 -}
 editMap :: Map -> Int -> Int -> Char -> Map
 editMap ([], h) _ _ _      = ([], h)
-editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 (2 * x) y obj
+editMap (r:ows, h) x y obj = editMapAux (r:ows, h) ([], h) 0 ((2 * x) + 1) y obj
 
 editMapAux :: Map -> Map -> Int -> Int -> Int -> Char -> Map
 editMapAux ([], _)   new y x0 y0 obj = new
