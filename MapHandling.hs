@@ -66,8 +66,8 @@ printSectionAux (m:ap, h) i x y r
   | i <= y - r - 1 = printSectionAux (ap, h) (i+1) x y r
   | i >= y + r + 1 = putStrLn ""
   | otherwise      = do
-      print (' ' : take (4*r+1) (drop (2*x-2*r-1) (rowToString m)) ++ " ")
-      printSectionAux (ap, h) (i+1) x y r
+     print (' ' : take (4*r+1) (drop (2*x-2*r-1) (rowToString m)) ++ " ")
+     printSectionAux (ap, h) (i+1) x y r
 
 {- editMap Map x y c
 
@@ -89,6 +89,9 @@ editMapWidth []     obj _ = []
 editMapWidth (m:ap) obj 0 = obj : ap
 editMapWidth (m:ap) obj w = m : editMapWidth ap obj (w - 1)
 
+{- readMap map x y
+
+-}
 readMap :: Map -> Int -> Int -> Tile
 readMap ([], h)   x y = (' ', False)
 readMap (map, h) x y = map !! max 0 y !! max 0 (2*x+1)

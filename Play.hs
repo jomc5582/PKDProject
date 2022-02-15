@@ -1,5 +1,5 @@
 import MapHandling as MH
-import Creature as C
+import Object as O
 
 {- MapInit width height
 
