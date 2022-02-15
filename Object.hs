@@ -13,13 +13,13 @@ data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving Eq
 
 -}
 movePos :: Position -> Position -> Map -> Map
-movePos (x0, y0) (x1, y1) map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0)) x0 y0 ('_', False)
+movePos (x0, y0) (x1, y1) map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0)) x0 y0 (('_', False), MH.Void)
 
 {- move 
 
 -}
 move :: Position -> Direction -> Map -> Map 
-move (x0, y0) dir map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0)) x0 y0 ('_', False)
+move (x0, y0) dir map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0)) x0 y0 (('_', False), MH.Void)
   where numDir = directionalValue dir
         y1     = y0 + (fst numDir)
         x1     = x0 + (snd numDir)

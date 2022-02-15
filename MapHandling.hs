@@ -9,29 +9,33 @@ MUTABLE QUALITY WOULD MAKE IT MORE
 USEFUL FOR ACTUAL GAME DEVELOPMENT
 -}
 --          (Visual, occupied)
-type Tile = (Char, Bool)
-type MapRow = [Tile]
+type TileBit = (Char, Bool)
+type Tile    = (TileBit, TempTile)
+type MapRow  = [Tile]
 type MapPart = [MapRow]
 --         (map, height)
 type Map = (MapPart, Int)
+
+data TempTile = Temp TileBit | Void deriving Eq
 
 {- newMap w h
    PRECONS: 
    
    EXAMPLE: 
    VARIANT: 
--- TODO REMAKE USING TEXAS RANGES
+-- TODO REMAKE USING TEXAS RANGES?
 -}
 newMap :: Int -> Int -> Map
 newMap w h            = (newMapHeight (newMapWidth w) h, h)
   where newMapWidth :: Int -> MapRow
         newMapWidth w
-          | w <= 0    = [(' ', False)]
-          | otherwise = (' ', False) : ('_', False) : newMapWidth (w - 1)
+          | w <= 0    = [empty]
+          | otherwise = empty : empty : newMapWidth (w - 1)
         newMapHeight :: MapRow -> Int -> MapPart
         newMapHeight w h
           | h <= 0    = []
           | otherwise = w : newMapHeight w (h - 1)
+        empty = ((' ', False), Void)
 
 {- printMap map rows
 
@@ -49,7 +53,8 @@ printMap (r:ows, h)
 -}
 rowToString :: MapRow -> String 
 rowToString [] = []
-rowToString (x:xs) = (fst x) : rowToString xs
+rowToString ((x, Void):xs)   = (fst x) : rowToString xs
+rowToString ((x, Temp y):xs) = (fst y) : rowToString xs
 
 {- printSection map x y radius
 
@@ -83,7 +88,7 @@ editMapAux (o:ld, h) new y x0 y0 obj
   | otherwise  = editMapAux (ld, h) (newMap ++ [o], h) (y + 1) x0 y0 obj
   where newMap = fst new
 
--- TODO EDIT TO "TAKE / DROP FUNCTION"
+-- TODO EDIT TO "TAKE / DROP FUNCTION"?
 editMapWidth :: MapRow -> Tile -> Int -> MapRow
 editMapWidth []     obj _ = []
 editMapWidth (m:ap) obj 0 = obj : ap
@@ -93,5 +98,5 @@ editMapWidth (m:ap) obj w = m : editMapWidth ap obj (w - 1)
 
 -}
 readMap :: Map -> Int -> Int -> Tile
-readMap ([], h)   x y = (' ', False)
+readMap ([], h)  x y = ((' ', False), Void)
 readMap (map, h) x y = map !! max 0 y !! max 0 (2*x+1)
