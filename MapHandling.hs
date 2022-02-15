@@ -29,13 +29,14 @@ newMap :: Int -> Int -> Map
 newMap w h            = (newMapHeight (newMapWidth w) h, h)
   where newMapWidth :: Int -> MapRow
         newMapWidth w
-          | w <= 0    = [empty]
-          | otherwise = empty : empty : newMapWidth (w - 1)
+          | w <= 0    = [none]
+          | otherwise = none : empty : newMapWidth (w - 1)
         newMapHeight :: MapRow -> Int -> MapPart
         newMapHeight w h
           | h <= 0    = []
           | otherwise = w : newMapHeight w (h - 1)
-        empty = ((' ', False), Void)
+        empty = (('_', False), Void)
+        none  = ((' ', False), Void)
 
 {- printMap map rows
 
@@ -94,9 +95,30 @@ editMapWidth []     obj _ = []
 editMapWidth (m:ap) obj 0 = obj : ap
 editMapWidth (m:ap) obj w = m : editMapWidth ap obj (w - 1)
 
+editMapTemp :: Map -> Int -> Int -> TempTile -> Map
+editMapTemp ([], h) _ _ _       = ([], h)
+editMapTemp (r:ows, h) x y temp = editMapAuxTemp (r:ows, h) ([], h) 0 (2 * x + 1) y temp
+
+editMapAuxTemp :: Map -> Map -> Int -> Int -> Int -> TempTile -> Map
+editMapAuxTemp ([], _)   new y x0 y0 temp = new
+editMapAuxTemp (o:ld, h) new y x0 y0 temp
+  | y == y0    = (newMap ++ [editMapWidthTemp o temp x0] ++ ld , h)
+  | otherwise  = editMapAuxTemp (ld, h) (newMap ++ [o], h) (y + 1) x0 y0 temp
+  where newMap = fst new
+
+-- TODO EDIT TO "TAKE / DROP FUNCTION"?
+editMapWidthTemp :: MapRow -> TempTile -> Int -> MapRow
+editMapWidthTemp []     temp _      = []
+editMapWidthTemp ((m, _):ap) temp 0 = (m, temp) : ap
+editMapWidthTemp (m:ap) temp w      = m : editMapWidthTemp ap temp (w - 1)
+
 {- readMap map x y
 
 -}
 readMap :: Map -> Int -> Int -> Tile
 readMap ([], h)  x y = ((' ', False), Void)
 readMap (map, h) x y = map !! max 0 y !! max 0 (2*x+1)
+
+hasTemp :: Tile -> Bool 
+hasTemp (_, Void) = False
+hasTemp (_, _)    = True
