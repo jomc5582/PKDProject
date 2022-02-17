@@ -9,14 +9,24 @@ type Position  = (Int, Int)
 -}
 data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving Eq
 
-{- move
+{- movePos
 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
 -}
 movePos :: Position -> Position -> Map -> Map
 movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd oldPos)) x0 y0 MH.Void
   where oldPos = MH.readMap map x0 y0
 {- move 
 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
 -}
 move :: Position -> Direction -> Map -> Map 
 move (x0, y0) dir map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0)) x0 y0 (('_', False), MH.Void)
@@ -26,6 +36,11 @@ move (x0, y0) dir map = MH.editMap (MH.editMap map x1 y1 (MH.readMap map x0 y0))
 
 {- directionalValue dir
 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
 -}
 directionalValue :: Direction -> Position
 directionalValue dir
@@ -39,8 +54,13 @@ directionalValue dir
   | dir == NW = (-1, -1)
   | otherwise = ( 0,  0)
 
---collides :: Position -> Map -> Bool 
---collides (x, y) map = if MH.hasTemp tile then tile else True 
-  --where tile = MH.readMap map x y 
+{- 
 
-
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+collides :: Position -> Map -> Bool 
+collides (x, y) map = MH.getCollision (MH.readMap map x y)
