@@ -6,7 +6,7 @@ import Object as O
 -- ! Is object needed here?
 
 {- MapInit width height
-
+   
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
