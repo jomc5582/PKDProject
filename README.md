@@ -21,3 +21,15 @@ Repo for work on the group project in the coarse PKD 2022
     We will update eachother on what needs to be done and at what stage 
     we are at the occations we either meet up or otherwise communicate
     on the topic of the PKD Project.
+# Dealing with surprises 
+
+- What should you do if somebody feels left outside?
+    If there would be a situation where anyone in the group feels left out or not listened to there wont be a major problem taking it with the rest of the group. We have great communication. As a safety precaution one could seek help with our supervisor to resolve any lack of communication
+
+- What should you do if someone gets stuck on their current task?
+    Initially seek help with the others in the group, so that we all can try to solve the problem before we seek further help.
+
+- What happens if someone feels another person isn’t doing their fair share?
+    Try to talk with them to understand why they dont do their fair share, worst case ask the supervisor for help.
+- What happens if someone is not communicating in the manner or frequency agreed upon?
+    try to talk to them and beg them to understand the situation and try to improve their communication. else seek help from the supervisor
