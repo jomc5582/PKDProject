@@ -259,5 +259,8 @@ getCollision :: Tile -> Bool
 getCollision ((tile, col), Void)  = col
 getCollision (_, Temp (temp, tempCol)) = tempCol
 
+tempToBase :: Temporary -> Base
+tempToBase Void                = (' ', False)
+tempToBase (Temp (char, bool)) = (char, bool)
 
 --------------------------------------------------------------

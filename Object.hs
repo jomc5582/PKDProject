@@ -101,6 +101,45 @@ directionalValue dir
 collides :: Position -> Map -> Bool
 collides (x, y) map = MH.getCollision (MH.readMap map x y)
 
+{- getType pos map
+
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+getType :: Position -> Map -> MH.Base
+getType (x, y) map
+  | MH.hasTemp tile = MH.tempToBase (snd tile)
+  | otherwise       = fst tile
+  where tile = MH.readMap map x y
+
+{- directionFrom
+
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-} -- TODO CODE DOES NOT WORK AS INTENDED; FIX THE IMPLEMENTATION; POSSIBLE BUG IN "editMapTemp"
+directionFrom :: Position -> Position -> Direction
+directionFrom (x1, y1) (x2, y2)
+  | x1 < x2   = if y1 < y2 then NW else if y1 == y1 then N           else NE
+  | x1 == x2  = if y1 < y2 then W  else if y1 == y1 then Object.Void else E
+  | x1 > x2   = if y1 < y2 then SW else if y1 == y1 then S           else SE
+  | otherwise = Object.Void
+
+{- exampleObject pos map
+
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-} 
+exampleObject :: Position -> Position -> Map -> Map
+exampleObject pos playerPos = move pos (directionFrom playerPos pos)
 
 {- 
 
@@ -110,3 +149,4 @@ collides (x, y) map = MH.getCollision (MH.readMap map x y)
    VARIANT: 
    SIDE EFFECTS: 
 -}
+
