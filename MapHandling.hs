@@ -1,22 +1,24 @@
 module MapHandling where
 
+import Test.HUnit
+
 {- -- TODO
 MAYBE MAKE INTO ARRAY INSTEAD OF LIST
 MUTABLE QUALITY WOULD MAKE IT MORE 
 USEFUL FOR ACTUAL GAME DEVELOPMENT
 -}
 --          (Visual, occupied)
-type TileBit = (Char, Bool)
-type Tile    = (TileBit, TempTile)
+type Base = (Char, Bool)
+type Tile    = (Base, Temporary)
 type MapRow  = [Tile]
 type MapPart = [MapRow]
 --         (map, height)
 type Map = (MapPart, Int)
 
-{- TempTile Temp TileBit | Void
+{- Temporary Temp Base | Void
    Represents a temporary (Movable) tile where if there is none is left as Void.
 -}
-data TempTile = Temp TileBit | Void deriving Eq
+data Temporary = Temp Base | Void deriving Eq
 
 {- newMap w h
    Generates an empty map of entered width w and entered height h.
@@ -70,7 +72,7 @@ printMap (r:ows, h)
    Turns any MapRow value into a String value for ease of printing.
    PRECONS: Any valid MapRow data.
    RETURNS: The string of chars from the MapRow value where
-            TempTiles if they exists take precedence over the base tile value.
+            Temporarys if they exists take precedence over the base tile value.
    EXAMPLE: rowToString [((' ', False), Void), (('_', False), ('P', True)), ((' ', False), Void), (('_', False), Void)]
                         = " P _"
    VARIANT: length MapRow
@@ -165,10 +167,10 @@ editMapAux (o:ld, h) new y x0 y0 tile
 --editMapWidth (m:ap) obj 0 = obj : ap
 --editMapWidth (m:ap) obj w = m : editMapWidth ap obj (w - 1)
 
-{- editMapTemp map x y TempTile
+{- editMapTemp map x y Temporary
    Edits the temp value of the tile att he specifed location.
    PRECONS: A valid non negative coordinate within the maps bounds.
-   RETURNS: The map with the temptile value edited at the specified location.
+   RETURNS: The map with the Temporary value edited at the specified location.
    EXAMPLE: editMapTemp (newMap 5 5) 2 2 Temp ('P', True) ->
                          " _ _ _ _ _ "
                          " _ _ _ _ _ "
@@ -178,7 +180,7 @@ editMapAux (o:ld, h) new y x0 y0 tile
    VARIANT: length map
    SIDE EFFECTS: -
 -}
-editMapTemp :: Map -> Int -> Int -> TempTile -> Map
+editMapTemp :: Map -> Int -> Int -> Temporary -> Map
 editMapTemp ([], h) _ _ _       = ([], h)
 editMapTemp (r:ows, h) x y temp = editMapTempAux (r:ows, h) ([], h) 0 (2 * x + 1) y temp
 
@@ -186,7 +188,7 @@ editMapTemp (r:ows, h) x y temp = editMapTempAux (r:ows, h) ([], h) 0 (2 * x + 1
    Auxillary function meant to be ran from editMapTemp.
    PRECONS: A valid non negative coordinate within the maps bounds and an accumulator 
    ([], h) where h is the height of the final map and an accumulator y which is initialized 0.
-   RETURNS: The map with the temptile value edited at the specified location.
+   RETURNS: The map with the Temporary value edited at the specified location.
    EXAMPLE: editMapTempAux (newMap 5 5) ([], h) 0 2 2 Temp ('P', True) ->
                          " _ _ _ _ _ "
                          " _ _ _ _ _ "
@@ -196,21 +198,21 @@ editMapTemp (r:ows, h) x y temp = editMapTempAux (r:ows, h) ([], h) 0 (2 * x + 1
    VARIANT: length map
    SIDE EFFECTS: -
 -}
-editMapTempAux :: Map -> Map -> Int -> Int -> Int -> TempTile -> Map
+editMapTempAux :: Map -> Map -> Int -> Int -> Int -> Temporary -> Map
 editMapTempAux ([], _)   new y x0 y0 temp = new
 editMapTempAux (o:ld, h) new y x0 y0 temp
   | y == y0    = (newMap ++ [editMapWidthTemp o temp x0] ++ ld , h)
   | otherwise  = editMapTempAux (ld, h) (newMap ++ [o], h) (y + 1) x0 y0 temp
   where newMap = fst new
-        editMapWidthTemp :: MapRow -> TempTile -> Int -> MapRow
+        editMapWidthTemp :: MapRow -> Temporary -> Int -> MapRow
         editMapWidthTemp []  temp _ = []
         editMapWidthTemp map temp w = take w map ++ changeTemp map temp w : drop (w + 1) map
-        changeTemp :: MapRow -> TempTile -> Int -> Tile
+        changeTemp :: MapRow -> Temporary -> Int -> Tile
         changeTemp map temp i       = (fst (map !! max 0 (i-1)), temp)
 {-
 -- TODO EDIT TO "TAKE / DROP FUNCTION"? 
 -- ! Maybe remake editMapTemp all together?
-editMapWidthTemp :: MapRow -> TempTile -> Int -> MapRow
+editMapWidthTemp :: MapRow -> Temporary -> Int -> MapRow
 editMapWidthTemp []     temp _      = []
 editMapWidthTemp ((m, _):ap) temp 0 = (m, temp) : ap
 editMapWidthTemp (m:ap) temp w      = m : editMapWidthTemp ap temp (w - 1)
@@ -258,3 +260,4 @@ getCollision ((tile, col), Void)  = col
 getCollision (_, Temp (temp, tempCol)) = tempCol
 
 
+--------------------------------------------------------------
