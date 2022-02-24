@@ -130,7 +130,7 @@ directionFrom (x1, y1) (x2, y2)
   | x1 > x2   = if y1 < y2 then SW else if y1 == y1 then S           else SE
   | otherwise = Object.Void
 
-{- exampleObject pos map
+{- exampleObject pos map --! PUSHABLE TILES
 
    PRECONS: 
    RETURNS: 
