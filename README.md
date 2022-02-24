@@ -34,3 +34,10 @@ Repo for work on the group project in the coarse PKD 2022
     Try to talk with them to understand why they dont do their fair share, worst case ask the supervisor for help.
 - What happens if someone is not communicating in the manner or frequency agreed upon?
     try to talk to them and beg them to understand the situation and try to improve their communication. else seek help from the supervisor
+
+
+#Diary
+
+https://drive.google.com/drive/folders/1bOAEyflyx7hCQkwKB8z_Rj88GzXolmT8?usp=sharing_eip_m&invite=CLCXu5YJ&ts=62062f4a
+
+https://sv.overleaf.com/read/dmdvjqtxryrh
