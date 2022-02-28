@@ -137,7 +137,7 @@ printSectionAux (m:ap, h) i x y r
 -}
 editMap :: Map -> Int -> Int -> Tile -> Map
 editMap ([], h) _ _ _       = ([], h)
-editMap (r:ows, h) x y tile = editMapAux (r:ows, h) ([], h) 0 (2 * x + 1) y tile
+editMap (rows, h) x y tile = editMapAux (rows, h) ([], h) 0 (2 * x + 1) y tile
 
 {- editMapAux oldMap newMap acc x y tile
    Auxillary function meant to be ran from editMap
