@@ -42,7 +42,6 @@ movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd ol
                move (1, 1) E " _ _ _ _ _ " -> " _ _ _ _ _ "
                              " _ _ _ _ _ "    " _ _ _ _ _ "
                              " _ _ _ _ _ "    " _ _ _ _ _ "
-
                              " _ _ _ _ _ "    " _ P _ _ _ "
                              " _ P _ _ _ "    " _ _ _ _ _ "
                move (1, 1) N " _ _ _ _ _ " -> " _ _ _ _ _ "
@@ -52,8 +51,21 @@ movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd ol
    SIDE EFFECTS: -
 -}
 move :: Position -> Direction -> Map -> Map
-move (_, _)  Object.Void map = map
-move (x0, y0) dir map        = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd (MH.readMap map x0 y0))) x0 y0 MH.Void
+move pos dir map 
+  | collides (((fst pos) + (fst value)), ((snd pos) + (snd value))) map = map
+  | otherwise                                                       = moveAux pos dir map
+  where value = directionalValue dir
+
+{- moveAux
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+moveAux :: Position -> Direction -> Map -> Map
+moveAux (_, _)  Object.Void map = map
+moveAux (x0, y0) dir map        = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd (MH.readMap map x0 y0))) x0 y0 MH.Void
   where numDir = directionalValue dir
         y1     = y0 + fst numDir
         x1     = x0 + snd numDir
@@ -89,7 +101,6 @@ directionalValue dir
            collides (3, 3) " _ _ _ _ _ " = True
                            " _ _ _ P _ "
                            " _ _ _ _ _ "
-
                            " _ _ _ _ _ "
                            " _ _ _ _ _ "
            collides (0, 0) " _ _ _ _ _ " = False
@@ -102,7 +113,6 @@ collides :: Position -> Map -> Bool
 collides (x, y) map = MH.getCollision (MH.readMap map x y)
 
 {- getType pos map
-
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
@@ -116,7 +126,6 @@ getType (x, y) map
   where tile = MH.readMap map x y
 
 {- directionFrom
-
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
@@ -130,23 +139,80 @@ directionFrom (x1, y1) (x2, y2)
   | x1 > x2   = if y1 < y2 then SW else if y1 == y1 then S           else SE
   | otherwise = Object.Void
 
-{- exampleObject pos map --! PUSHABLE TILES
-
-   PRECONS: 
+{- clearTile pos map
+   PRECONS: -
    RETURNS: 
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
 -} 
-exampleObject :: Position -> Position -> Map -> Map
-exampleObject pos playerPos = move pos (directionFrom playerPos pos)
+clearTile :: Position -> Map -> Map 
+clearTile (x, y) map = editMap map x y (('_', False), MH.Void)
 
-{- 
+{- player
+   PRECONS: -
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-} 
+player :: MH.Temporary
+player = Temp ('P', True)
 
+{- enemy
+   PRECONS: -
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+enemy :: MH.Temporary
+enemy = Temp ('E', True)
+
+{- boulder
+   PRECONS: -
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+boulder :: MH.Temporary
+boulder = Temp ('O', True)
+
+{- treasure
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
 -}
+treasure :: MH.Base
+treasure = ('X', False)
 
+{- push pos playerPos map
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+push :: Position -> Position -> Map -> Map
+push pos playerPos = move pos (directionFrom playerPos pos)
+
+{- dig
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+dig :: Position -> Map -> (Map, Int)
+dig pos map = ((clearTile pos map), 100)
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
