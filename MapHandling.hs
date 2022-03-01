@@ -208,10 +208,11 @@ editMapTempAux (o:ld, h) new y x0 y0 temp
         editMapWidthTemp []  temp _ = []
         editMapWidthTemp map temp w = take w map ++ changeTemp map temp w : drop (w + 1) map
         changeTemp :: MapRow -> Temporary -> Int -> Tile
-        changeTemp map temp i       = (fst (map !! max 0 (i-1)), temp)
+        changeTemp row temp i       = (fst (head (drop (2 * i + 1) row)), temp) -- (fst (map !! max 0 (i-1)), temp)
+
 {-
 -- TODO EDIT TO "TAKE / DROP FUNCTION"? 
--- ! Maybe remake editMapTemp all together?
+-- ! Maybe remake editMapTemp all together?  
 editMapWidthTemp :: MapRow -> Temporary -> Int -> MapRow
 editMapWidthTemp []     temp _      = []
 editMapWidthTemp ((m, _):ap) temp 0 = (m, temp) : ap
