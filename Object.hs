@@ -51,7 +51,7 @@ movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd ol
    SIDE EFFECTS: -
 -}
 move :: Position -> Direction -> Map -> Map
-move pos dir map 
+move pos dir map
   | collides (((fst pos) + (fst value)), ((snd pos) + (snd value))) map = map
   | otherwise                                                       = moveAux pos dir map
   where value = directionalValue dir
@@ -145,8 +145,8 @@ directionFrom (x1, y1) (x2, y2)
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
--} 
-clearTile :: Position -> Map -> Map 
+-}
+clearTile :: Position -> Map -> Map
 clearTile (x, y) map = editMap map x y (('_', False), MH.Void)
 
 {- player
@@ -155,7 +155,7 @@ clearTile (x, y) map = editMap map x y (('_', False), MH.Void)
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
--} 
+-}
 player :: MH.Temporary
 player = Temp ('P', True)
 
@@ -197,7 +197,7 @@ treasure = ('X', False)
    SIDE EFFECTS: 
 -}
 push :: Position -> Position -> Map -> Map
-push pos playerPos = move pos (directionFrom playerPos pos)
+push pos playerPos = move pos (directionFrom pos playerPos)
 
 {- dig
    PRECONS: 
@@ -207,7 +207,7 @@ push pos playerPos = move pos (directionFrom playerPos pos)
    SIDE EFFECTS: 
 -}
 dig :: Position -> Map -> (Map, Int)
-dig pos map = ((clearTile pos map), 100)
+dig pos map = (clearTile pos map, 100)
 
 {- 
    PRECONS: 
