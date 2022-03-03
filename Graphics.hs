@@ -78,7 +78,7 @@ rulesplash = do
    putStrLn ""
    putStrLn " In this game you move using cardinal directions " 
    putStrLn ""
-   putStrLn " For example, if you want to move North on the map, enter the word 'North' "
+   putStrLn " For example, if you want to move Northwest on the map, enter 'NW' "
    putStrLn ""
    putStrLn " This is you: Z "
    putStrLn " These are enemies (watch out!): E "

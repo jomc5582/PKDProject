@@ -2,6 +2,12 @@ import MapHandling as MH
 import Object as O
 import Graphics as G
 
+main :: IO ()
+main = do
+   G.splash 
+   G.rulesplash
+
+
 {- Make the init function intiialize the loop with the starting
    correct values for starting the game. For example starting the game
    with a player on a populated map. Maybe figure out a neat way of 
