@@ -280,6 +280,9 @@ shake :: Position -> Map -> (Map, Int)
 shake (x, y) map = if getType (x, y) map == ('T', True) then (editMapTemp map x y MH.Void, 100)
                                                         else (map, 0)
 
+getPlayerCoord :: Map -> Position
+getPlayerCoord = undefined
+
 {- 
    PRECONS: 
    RETURNS: 
