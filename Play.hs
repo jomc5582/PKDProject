@@ -8,7 +8,7 @@ import Graphics as G
    initializing the map.
                                                                       -}
 init :: IO ()
-init = undefined
+init = loop (MH.newMap 10 10)
 
 {- Make the loop go through all update functions for respective list
    and make it check and update the lists for enteties like monsters
@@ -19,7 +19,6 @@ loop mapState = do
   putStrLn ""
   loop (update mapState)
   
-
 {- Make a list of all the items on the map ex: ("Player", Position)
    and make the function imperatively loop through all entries on the
    map and update their state. Example "MoveAI ("Monster", Position)"
@@ -28,4 +27,4 @@ loop mapState = do
    respective type.
                                                                       -}
 update :: MH.Map -> MH.Map
-update mapState = undefined
+update mapState = mapState
