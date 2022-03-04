@@ -85,6 +85,7 @@ update mapState = do
    SIDE EFFECTS: 
 -}
 playerInput :: String -> Map -> (Map, Int)
+playerInput _     map@([],   h) = (map, 0)
 playerInput input map@(m:ap, h)
   | take 4 input == "move"  = (move (playerCoord map) (translateDir (drop 5 input)) map, 0)
   | take 3 input == "dig"   = dig (playerCoord map) map
