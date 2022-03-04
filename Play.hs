@@ -38,7 +38,7 @@ initalize = do
    SIDE EFFECTS: 
 -}
 loop :: (MH.Map, Int) -> IO ()
-loop mapState = do
+loop mapState@(map, score) = do
   
   putStrLn ""
   -- Printing the map
@@ -46,20 +46,21 @@ loop mapState = do
   putStrLn (show playerX)
   putStrLn (show playerY)
   putStrLn ""
-
+  
   -- ! BREAKER
   putStrLn "What does the player wish to do?"
   input <- getLine 
-
   putStrLn input
   
   putStrLn ""
-  if input == "quit" then putStrLn "Quitting..." else loop (playerInput input map)
+  -- ! Test
+  newMap <- move (playerCoord map) (translateDir (drop 5 input)) map -- ERROR IS IN THIS ONE
+  
+  -- ! Test
+  if input == "quit" then putStrLn "Quitting..." else loop (newMap, score) --(fst (playerInput input map), score + snd (playerInput input map))
   where playerX = fst (O.getPlayerCoord 0 map)
         playerY = snd (O.getPlayerCoord 0 map)
-        map     = fst mapState
-        score   = snd mapState
-
+  
   {-
 {- update map
    PRECONS: 
@@ -87,10 +88,10 @@ update mapState = do
 playerInput :: String -> Map -> (Map, Int)
 playerInput _     map@([],   h) = (map, 0)
 playerInput input map@(m:ap, h)
-  | take 4 input == "move"  = (move (playerCoord map) (translateDir (drop 5 input)) map, 0)
-  | take 3 input == "dig"   = dig (playerCoord map) map
---  | take 5 input == "shake" = 
-  | otherwise               = (map, 0)
+  | take 4 input == "move"      = (move (playerCoord map) (translateDir (drop 5 input)) map, 0)
+  | take 3 input == "dig"       = dig (playerCoord map) map
+--  | take 5 input == "shake"     = 
+  | otherwise                   = (map, 0)
 
 {- translateDir
    PRECONS: 
@@ -118,4 +119,5 @@ translateDir dir
    VARIANT: 
    SIDE EFFECTS: 
 -}
+playerCoord :: Map -> Position
 playerCoord = O.getPlayerCoord 0
