@@ -96,13 +96,13 @@ moveAux (x0, y0) dir map        = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd 
 -}
 directionalValue :: Direction -> Position
 directionalValue dir
-  | dir == N  = (-1,  0)
-  | dir == NE = (-1,  1)
-  | dir == E  = ( 0,  1)
+  | dir == N  = ( 0, -1)
+  | dir == NE = ( 1, -1)
+  | dir == E  = ( 1,  0)
   | dir == SE = ( 1,  1)
-  | dir == S  = ( 1,  0)
-  | dir == SW = ( 1, -1)
-  | dir == W  = ( 0, -1)
+  | dir == S  = ( 0,  1)
+  | dir == SW = (-1,  1)
+  | dir == W  = (-1,  0)
   | dir == NW = (-1, -1)
   | otherwise = ( 0,  0)
 
@@ -276,12 +276,40 @@ dig pos map = if getType pos map == ('X', True) then (clearTile pos map, 100) el
    VARIANT: -
    SIDE EFFECTS: -
 -}
-shake :: Position -> Map -> (Map, Int)
-shake (x, y) map = if getType (x, y) map == ('T', True) then (editMapTemp map x y MH.Void, 100)
-                                                        else (map, 0)
+shake :: Position -> Direction -> Map -> (Map, Int)
+shake (x, y) dir map = if getType (x + dx, y + dy) map == ('T', True) then (editMapTemp map (x + dx) (y + dy) MH.Void, 100)
+                                                                      else (map, 0)
+  where dy = snd (directionalValue dir)
+        dx = fst (directionalValue dir)
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+getPlayerCoord :: Int -> Map -> Position
+getPlayerCoord _ ([], _)   = (-1, -1)
+getPlayerCoord y (m:ap, h) 
+  | x == -1   = getPlayerCoord (y + 1) (ap, h) 
+  | otherwise = (x `div` 2, y)
+  where
+  checkRow :: MapRow -> Int -> Int
+  checkRow []     _ = -1
+  checkRow (r:ow) w
+    | snd r == Temp ('Z', True) = w
+    | otherwise                 = checkRow ow (w + 1)
+  x = checkRow m 0
 
-getPlayerCoord :: Map -> Position
-getPlayerCoord = undefined
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+visionRange :: Int
+visionRange = 3
 
 {- 
    PRECONS: 

@@ -1,4 +1,4 @@
-import Prelude hiding (init)
+import System.IO
 import MapHandling as MH
 import Object as O
 import Graphics as G
@@ -14,13 +14,8 @@ main :: IO ()
 main = do
    G.splash 
    G.rulesplash
-   init
+   initalize
 
-{- Make the init function intiialize the loop with the starting
-   correct values for starting the game. For example starting the game
-   with a player on a populated map. Maybe figure out a neat way of 
-   initializing the map.
-                                                                      -}
 {- init
    PRECONS: 
    RETURNS: 
@@ -28,13 +23,13 @@ main = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-init :: IO ()
-init = loop (MH.newMap 10 10)
+initalize :: IO ()
+initalize = do
+  mapFile <- readFile "Map.txt"
+  let rows = lines mapFile 
+  --MH.printMap (move (playerCoord ((generateMap rows), 20)) N ((generateMap rows), 20))
+  loop (((generateMap rows), 20), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
 
-{- Make the loop go through all update functions for respective list
-   and make it check and update the lists for enteties like monsters
-   and interactables and of course the player.
-                                                                      -}
 {- loop map
    PRECONS: 
    RETURNS: 
@@ -42,18 +37,30 @@ init = loop (MH.newMap 10 10)
    VARIANT: 
    SIDE EFFECTS: 
 -}
-loop :: MH.Map -> IO ()
+loop :: (MH.Map, Int) -> IO ()
 loop mapState = do
-  putStrLn ""
-  loop (update mapState)
   
-{- Make a list of all the items on the map ex: ("Player", Position)
-   and make the function imperatively loop through all entries on the
-   map and update their state. Example "MoveAI ("Monster", Position)"
-   If it is easier, make multiple update functions "updateMonster",
-   "updatePlayer", "updateInteractables" and give separate lists of
-   respective type.
-                                                                      -}
+  putStrLn ""
+  -- Printing the map
+  G.printMap map playerX playerY visionRange
+  putStrLn (show playerX)
+  putStrLn (show playerY)
+  putStrLn ""
+
+  -- ! BREAKER
+  putStrLn "What does the player wish to do?"
+  input <- getLine 
+
+  putStrLn input
+  
+  putStrLn ""
+  if input == "quit" then putStrLn "Quitting..." else loop (playerInput input map)
+  where playerX = fst (O.getPlayerCoord 0 map)
+        playerY = snd (O.getPlayerCoord 0 map)
+        map     = fst mapState
+        score   = snd mapState
+
+  {-
 {- update map
    PRECONS: 
    RETURNS: 
@@ -61,13 +68,14 @@ loop mapState = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-update :: MH.Map -> IO (MH.Map)
+update :: MH.Map -> IO ()
 update mapState = do 
    input <- getLine
-   playerInput input map
+   --playerInput input map
    -- update Enemies
    -- timer
    return mapState
+-}
 
 {- playerInput input map
    PRECONS: 
@@ -76,13 +84,37 @@ update mapState = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-playerInput = undefined
-{-
---playerInput :: IO ()
-playerInput input map
-  | take 4 input == "move"  then move  else 
-  | take 3 input == "dig"   then dig   else 
-  | take 5 input == "shake" then shake else
-  | otherwise = playerInput
+playerInput :: String -> Map -> (Map, Int)
+playerInput input map@(m:ap, h)
+  | take 4 input == "move"  = (move (playerCoord map) (translateDir (drop 5 input)) map, 0)
+  | take 3 input == "dig"   = dig (playerCoord map) map
+--  | take 5 input == "shake" = 
+  | otherwise               = (map, 0)
 
+{- translateDir
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
 -}
+translateDir :: String -> O.Direction
+translateDir dir
+  | dir == "N"  = N 
+  | dir == "NE" = NE
+  | dir == "E"  = E
+  | dir == "SE" = SE
+  | dir == "S"  = S
+  | dir == "SW" = SW
+  | dir == "W"  = W
+  | dir == "NW" = NW
+  | otherwise   = O.Void
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+playerCoord = O.getPlayerCoord 0

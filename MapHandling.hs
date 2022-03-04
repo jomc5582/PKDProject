@@ -47,6 +47,37 @@ newMap w h            = (newMapHeight (newMapWidth w) h, h)
         empty = (('_', False), Void)
         none  = ((' ', False), Void)
 
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+generateMap :: [String] -> MapPart
+generateMap [] = []
+generateMap (r:ows) = (init (drop 1 (generateRow r))) : generateMap ows
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+generateRow :: String -> MapRow
+generateRow []     = []
+generateRow (r:ow)
+  | r == ' '  = empty : generateRow ow
+  | otherwise = (generateRowAux (r:ow)) : (generateRow (drop 4 (r:ow)))
+  where generateRowAux (a:b:c:d:xs) 
+          | c == 'V'  = ((a, transBool b), Void)
+          | otherwise = ((a, transBool b), (Temp (c, transBool d)))
+        transBool b
+          | b == 'T'  = True
+          | otherwise = False
+        empty = ((' ', False), Void)
+
 {- printMap map
    Prints the entered map row by row.
    PRECONS: Any valid map.
