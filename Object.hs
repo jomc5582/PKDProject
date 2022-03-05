@@ -9,7 +9,6 @@ type Position  = (Int, Int)
 -}
 data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving Eq
 
--- TODO REMAKE WITH TRY CATCH STRUCTURE
 {- movePos (x0, y0) (x1, y1) map
    Moves the temporary tile from the first position to the second. 
    This overwrites the value at the second position and leaves the 
@@ -30,7 +29,6 @@ movePos :: Position -> Position -> Map -> Map
 movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd oldPos)) x0 y0 MH.Void
   where oldPos = MH.readMap map x0 y0
 
--- TODO REMAKE WITH TRY CATCH STRUCTURE
 {- move (x0, y0) dir map
    Checks if the tile being moved into is alvaliable if so it moves the temp value from the specified tile
    one step in the specied direction, does not move if Void.
@@ -82,8 +80,8 @@ moveAux :: Position -> Direction -> Map -> Map
 moveAux (_, _)  Object.Void map = map
 moveAux (x0, y0) dir map        = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd (MH.readMap map x0 y0))) x0 y0 MH.Void
   where numDir = directionalValue dir
-        y1     = y0 + fst numDir
-        x1     = x0 + snd numDir
+        x1     = x0 + fst numDir
+        y1     = y0 + snd numDir
 
 {- directionalValue dir
    Returns the coordinate values of an entered direction. Void returns (0, 0)
@@ -154,7 +152,7 @@ getType (x, y) map
    EXAMPLE: directionFrom (1, 1) (1, 2) = direction S
    VARIANT: -
    SIDE EFFECTS: -
--} -- TODO CODE DOES NOT WORK AS INTENDED; FIX THE IMPLEMENTATION; POSSIBLE BUG IN "editMapTemp"
+-} 
 directionFrom :: Position -> Position -> Direction
 directionFrom (x1, y1) (x2, y2)
   | x1 < x2   = if y1 < y2 then NW else if y1 == y1 then N           else NE

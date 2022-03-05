@@ -2,11 +2,6 @@ module MapHandling where
 
 import Test.HUnit
 
-{- -- TODO
-MAYBE MAKE INTO ARRAY INSTEAD OF LIST
-MUTABLE QUALITY WOULD MAKE IT MORE 
-USEFUL FOR ACTUAL GAME DEVELOPMENT
--}
 --          (Visual, occupied)
 type Base = (Char, Bool)
 type Tile    = (Base, Temporary)
@@ -56,7 +51,7 @@ newMap w h            = (newMapHeight (newMapWidth w) h, h)
 -}
 generateMap :: [String] -> MapPart
 generateMap [] = []
-generateMap (r:ows) = (init (drop 1 (generateRow r))) : generateMap ows
+generateMap (r:ows) = generateRow r : generateMap ows
 
 {- 
    PRECONS: 
@@ -241,15 +236,6 @@ editMapTempAux (o:ld, h) new y x0 y0 temp
         changeTemp :: MapRow -> Temporary -> Int -> Tile
         changeTemp row temp i       = (fst (head (drop (i) row)), temp) -- (fst (map !! max 0 (i-1)), temp)
 
-{-
--- TODO EDIT TO "TAKE / DROP FUNCTION"? 
--- ! Maybe remake editMapTemp all together?  
-editMapWidthTemp :: MapRow -> Temporary -> Int -> MapRow
-editMapWidthTemp []     temp _      = []
-editMapWidthTemp ((m, _):ap) temp 0 = (m, temp) : ap
-editMapWidthTemp (m:ap) temp w      = m : editMapWidthTemp ap temp (w - 1)
--}
-
 {- readMap map x y
    Returns the tile value at the location 
    PRECONS: A valid non negative coordinate within the maps bounds.
@@ -291,6 +277,9 @@ getCollision :: Tile -> Bool
 getCollision ((tile, col), Void)  = col
 getCollision (_, Temp (temp, tempCol)) = tempCol
 
+{- tempToBase temp
+
+-}
 tempToBase :: Temporary -> Base
 tempToBase Void                = (' ', False)
 tempToBase (Temp (char, bool)) = (char, bool)

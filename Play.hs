@@ -12,9 +12,19 @@ import Graphics as G
 -}
 main :: IO ()
 main = do
-   G.splash 
-   G.rulesplash
-   initalize
+  G.splash 
+  pause
+  G.rulesplash
+  pause
+  initalize
+
+pause :: IO ()
+pause = do
+  putStrLn ""
+  putStrLn "Press Enter to continue..."
+  wait <- getLine 
+  putStrLn ""
+
 
 {- init
    PRECONS: 
@@ -29,7 +39,7 @@ initalize = do
   let rows = lines mapFile 
   --MH.printMap (move (playerCoord ((generateMap rows), 20)) N ((generateMap rows), 20))
   loop (((generateMap rows), 20), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
-
+  --loop ((editMap (newMap 5 5) 2 2 (('X', False), Temp ('Z', True))), 0)
 {- loop map
    PRECONS: 
    RETURNS: 
@@ -37,46 +47,38 @@ initalize = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-loop :: (MH.Map, Int) -> IO ()
+loop :: (Map, Int) -> IO ()
 loop mapState@(map, score) = do
-  
   putStrLn ""
   -- Printing the map
-  G.printMap map playerX playerY visionRange
-  putStrLn (show playerX)
-  putStrLn (show playerY)
-  putStrLn ""
+  G.printMap map (playerX + 1) playerY visionRange
   
-  -- ! BREAKER
   putStrLn "What does the player wish to do?"
   input <- getLine 
-  putStrLn input
-  
   putStrLn ""
-  -- ! Test
-  newMap <- move (playerCoord map) (translateDir (drop 5 input)) map -- ERROR IS IN THIS ONE
   
-  -- ! Test
-  if input == "quit" then putStrLn "Quitting..." else loop (newMap, score) --(fst (playerInput input map), score + snd (playerInput input map))
+  --let  -- (move (playerCoord map) (translateDir (drop 5 input)) map) -- ERROR IS IN THIS ONE
+  
+  if input == "quit" then putStrLn "Quitting..." else loop (newState input) -- (fst (playerInput input map), score + snd (playerInput input map))
   where playerX = fst (O.getPlayerCoord 0 map)
         playerY = snd (O.getPlayerCoord 0 map)
+        newState = update mapState
   
-  {-
-{- update map
+{- update map input
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
 -}
-update :: MH.Map -> IO ()
-update mapState = do 
-   input <- getLine
-   --playerInput input map
-   -- update Enemies
-   -- timer
-   return mapState
--}
+update :: (Map, Int) -> String -> (Map, Int)
+update mapState input = playerInput input mapState
+   {-
+   map1 <- playerInput input mapState
+   --map2 <- update Enemies
+   --timer?
+   return map1
+   -}
 
 {- playerInput input map
    PRECONS: 
@@ -85,13 +87,13 @@ update mapState = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-playerInput :: String -> Map -> (Map, Int)
-playerInput _     map@([],   h) = (map, 0)
-playerInput input map@(m:ap, h)
-  | take 4 input == "move"      = (move (playerCoord map) (translateDir (drop 5 input)) map, 0)
-  | take 3 input == "dig"       = dig (playerCoord map) map
+playerInput :: String -> (Map, Int) -> (Map, Int)
+playerInput _     (([],   h), p) = (([],   h), p)
+playerInput input ((m:ap, h), p)
+  | take 4 input == "move"       = (move (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p + 0)
+  | take 3 input == "dig"        = dig (playerCoord (m:ap, h)) (m:ap, h)
 --  | take 5 input == "shake"     = 
-  | otherwise                   = (map, 0)
+  | otherwise                    = ((m:ap, h), p)
 
 {- translateDir
    PRECONS: 
