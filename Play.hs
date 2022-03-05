@@ -50,6 +50,8 @@ initalize = do
 loop :: (Map, Int) -> IO ()
 loop mapState@(map, score) = do
   putStrLn ""
+  putStrLn scoreLine
+  putStrLn ""
   -- Printing the map
   G.printMap map (playerX + 1) playerY visionRange
   
@@ -60,9 +62,10 @@ loop mapState@(map, score) = do
   --let  -- (move (playerCoord map) (translateDir (drop 5 input)) map) -- ERROR IS IN THIS ONE
   
   if input == "quit" then putStrLn "Quitting..." else loop (newState input) -- (fst (playerInput input map), score + snd (playerInput input map))
-  where playerX = fst (O.getPlayerCoord 0 map)
-        playerY = snd (O.getPlayerCoord 0 map)
-        newState = update mapState
+  where playerX   = fst (O.getPlayerCoord 0 map)
+        playerY   = snd (O.getPlayerCoord 0 map)
+        newState  = update mapState
+        scoreLine = "Score: " ++ (show score)
   
 {- update map input
    PRECONS: 
@@ -89,11 +92,15 @@ update mapState input = playerInput input mapState
 -}
 playerInput :: String -> (Map, Int) -> (Map, Int)
 playerInput _     (([],   h), p) = (([],   h), p)
-playerInput input ((m:ap, h), p)
-  | take 4 input == "move"       = (move (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p + 0)
-  | take 3 input == "dig"        = dig (playerCoord (m:ap, h)) (m:ap, h)
+playerInput input map@((m:ap, h), p)
+  | take 4 input == "move" = (move    (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p)
+  | take 3 input == "dig"  = dig (playerCoord (m:ap, h)) (m:ap, h)
+  -- | take 4 input == "push" = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
+  | take 4 input == "push" = (move (x, y + 1) (directionFrom (x, y + 1) (x, y)) (m:ap, h), p)
 --  | take 5 input == "shake"     = 
-  | otherwise                    = ((m:ap, h), p)
+  | otherwise              = ((m:ap, h), p)
+  where x = fst (playerCoord (m:ap, h))
+        y = snd (playerCoord (m:ap, h))
 
 {- translateDir
    PRECONS: 

@@ -143,7 +143,7 @@ getType :: Position -> Map -> MH.Base
 getType (x, y) map
   | MH.hasTemp tile = MH.tempToBase (snd tile)
   | otherwise       = fst tile
-  where tile = MH.readMap map x y
+  where tile        = MH.readMap map x y
 
 {- directionFrom pos1 pos2
    Gets the direction of position one relative position two.
@@ -155,9 +155,9 @@ getType (x, y) map
 -} 
 directionFrom :: Position -> Position -> Direction
 directionFrom (x1, y1) (x2, y2)
-  | x1 < x2   = if y1 < y2 then NW else if y1 == y1 then N           else NE
-  | x1 == x2  = if y1 < y2 then W  else if y1 == y1 then Object.Void else E
-  | x1 > x2   = if y1 < y2 then SW else if y1 == y1 then S           else SE
+  | x1 < x2   = if y1 < y2 then NW else if y1 == y1 then W           else SW
+  | x1 == x2  = if y1 < y2 then N  else if y1 == y1 then Object.Void else S
+  | x1 > x2   = if y1 < y2 then NE else if y1 == y1 then E           else SE
   | otherwise = Object.Void
 
 {- clearTile pos map
@@ -239,6 +239,20 @@ goal = ('C', False)
    VARIANT: -
    SIDE EFFECTS: -
 -}
+pushDir :: Direction -> Position -> Map -> Map
+pushDir dir (x, y) map = push (dx + x, dy + y) (x, y) map
+  where value = directionalValue dir
+        dx = fst value
+        dy = snd value
+
+{- push pos playerPos map
+   Checks if a tile is occupying the space and if it is of a type that is allowed to be pushed.
+   PRECONS: A valid position within the maps boundries.
+   RETURNS: The map with updated positions.
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: -
+-}
 push :: Position -> Position -> Map -> Map
 push pos playerPos map
   | getType pos map == ('O', True) = pushAux pos playerPos map
@@ -265,7 +279,7 @@ pushAux pos playerPos = move pos (directionFrom pos playerPos)
    SIDE EFFECTS: -
 -}
 dig :: Position -> Map -> (Map, Int)
-dig pos map = if getType pos map == ('X', True) then (clearTile pos map, 100) else (map, 0)
+dig pos map = if getType pos map == ('X', False) then (clearTile pos map, 100) else (map, 0)
 
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
