@@ -3,6 +3,7 @@ import MapHandling as MH
 import Object as O
 import Graphics as G
 
+
 {- main
    PRECONS: 
    RETURNS: 
@@ -35,7 +36,7 @@ pause = do
 -}
 initalize :: IO ()
 initalize = do
-  mapFile <- readFile "Map.txt"
+  mapFile <- readFile "level1.txt"
   let rows = lines mapFile
 
   playAgainLoop rows -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
@@ -76,8 +77,7 @@ loop mapState@(map, score) = do
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine
 
-  if getWin map then winSplash else putStrLn ""
-  if input == "quit" then putStrLn "Quitting..." else loop (newState input)
+  if getWin map then (if getWin map then winSplash else putStrLn "") else (if input == "quit" then putStrLn "Quitting..." else loop (newState input))
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
         newState  = update mapState

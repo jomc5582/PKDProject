@@ -1,9 +1,6 @@
 module Graphics where
 
 import MapHandling as MH
-import Object as O
-
--- ! Is object needed here?
 
 {- MapInit width height
    
@@ -48,6 +45,7 @@ printFullMap = MH.printMap
 -}
 splash :: IO ()
 splash = do
+  putStrLn ""
   putStrLn "                ___________.__                              "
   putStrLn "               \\__    ___/|  |__   ____                     "
   putStrLn "                 |    |   |  |  \\_/ __ \\                    "
@@ -66,6 +64,7 @@ splash = do
   putStrLn "   /     /_ |  |__/ __ \\  \\___|    <\\  ___/|  | \\/   |  \\  "
   putStrLn "  /_______ \\|____(____  /\\___  >__|_ \\___  >__|  |___|  /  "
   putStrLn "          \\/          \\/     \\/     \\/    \\/           \\/   "
+  putStrLn ""
 
 ruleSplash :: IO ()
 ruleSplash = do
@@ -91,9 +90,9 @@ ruleSplash = do
    putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-
 winSplash :: IO ()
 winSplash = do
+   splash
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
    putStrLn " Congratulations, you won! " 
@@ -104,6 +103,5 @@ winSplash = do
    putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
-
 
 --if the player chooses n, add string "Thanks for playing!" and then trigger the quit function
