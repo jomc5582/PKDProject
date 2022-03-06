@@ -279,7 +279,23 @@ pushAux pos playerPos = move pos (directionFrom playerPos pos)
    SIDE EFFECTS: -
 -}
 dig :: Position -> Map -> Map
-dig pos map = if getType pos map == ('X', False) then clearTile pos map else map
+dig pos@(x, y) map = if fst (readMap map x y) == ('X', False) then digTile pos map else map
+
+{- digTile pos map
+   clears a specified tile on the map.
+   PRECONS: A valid coordinate within the boundries of the map.
+   RETURNS: The map with the tile specified changed to (('_', False), Temp ('Z', True)))
+   EXAMPLE: 
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+           digTile (3, 3) " _ _ _ _ _ " = " _ _ _ _ _ "
+                          " _ _ _ P _ "   " _ _ _ Z _ "
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
+-}
+digTile :: Position -> Map -> Map
+digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
 
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
