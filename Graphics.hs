@@ -89,3 +89,20 @@ rulesplash = do
    putStrLn " There are also trees (T) and boulders (O) around that you can interact with"
    putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+
+winsplash :: IO ()
+winsplash = do
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
+   putStrLn " Congratulations, you won! " 
+   putStrLn ""
+   putStrLn " You survived your adventure and made it to your computer "
+   putStrLn ""
+   putStrLn " We hope you enjoyed your journey here!  " 
+   putStrLn ""
+   putStrLn " Do you want to play again? [y/n] "
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+
+--if the player chooses n, add string "Thanks for playing!" and then trigger the quit function
