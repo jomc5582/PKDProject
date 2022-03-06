@@ -1,6 +1,8 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Object where
 
 import MapHandling as MH
+import Debug.Trace
 
 type Position  = (Int, Int)
 
@@ -57,7 +59,7 @@ move pos dir map
   where value = directionalValue dir
 
 {- moveAux (x0, y0) dir map
-   Auxillary function, run from move
+   auxilary function, run from move
    PRECONS: A valid coordinate to the tile and a valid direction where the tile in the direction is within
             the maps bounds.
    RETURNS: The map with the specified tile moved. 
@@ -152,12 +154,12 @@ getType (x, y) map
    EXAMPLE: directionFrom (1, 1) (1, 2) = direction S
    VARIANT: -
    SIDE EFFECTS: -
--} 
+-}
 directionFrom :: Position -> Position -> Direction
 directionFrom (x1, y1) (x2, y2)
-  | x1 < x2   = if y1 < y2 then SW else if y1 == y2 then W           else NW
-  | x1 == x2  = if y1 < y2 then S  else if y1 == y2 then Object.Void else N
-  | x1 > x2   = if y1 < y2 then SE else if y1 == y2 then E           else NE
+  | x1 < x2   = if y1 < y2 then NW else if y1 == y2 then W           else SW
+  | x1 == x2  = if y1 < y2 then W  else if y1 == y2 then Object.Void else S
+  | x1 > x2   = if y1 < y2 then NE else if y1 == y2 then E           else SE
   | otherwise = Object.Void
 
 {- clearTile pos map
@@ -240,7 +242,7 @@ goal = ('C', False)
    SIDE EFFECTS: -
 -}
 pushDir :: Direction -> Position -> Map -> Map
-pushDir dir (x, y) map = move (dx + x, dy + y) dir map --push (dx + x, dy + y) (x, y) map
+pushDir dir (x, y) = move (dx + x, dy + y) dir
   where value = directionalValue dir
         dx = fst value
         dy = snd value
@@ -261,7 +263,7 @@ push pos playerPos map
   | otherwise                      = map
 
 {- pushAux pos playerPos map
-   Auxillary function, meant to be ran from push
+   auxilary function, meant to be ran from push
    PRECONS: A valid position within the maps boundries.
    RETURNS: The map with updated positions 
    EXAMPLE: -
@@ -297,6 +299,29 @@ dig pos@(x, y) map = if fst (readMap map x y) == ('X', False) then digTile pos m
 digTile :: Position -> Map -> Map
 digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
 
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+hit :: Position -> Direction -> Map -> Map
+hit pos@(x, y) dir map = if snd (readMap map (x + dx) (y + dy)) == enemy then hitTile (x + dx, y + dy) map else map
+  where value = directionalValue dir
+        dx    = fst value
+        dy    = snd value
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+hitTile :: Position -> Map -> Map
+hitTile (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
+
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
    RETURNS: The changed (or unchanged) map tupled with a score value.
@@ -304,11 +329,12 @@ digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
    VARIANT: -
    SIDE EFFECTS: -
 -}
-shake :: Position -> Direction -> Map -> (Map, Int)
-shake (x, y) dir map = if getType (x + dx, y + dy) map == ('T', True) then (editMapTemp map (x + dx) (y + dy) MH.Void, 100)
-                                                                      else (map, 0)
+shake :: Position -> Direction -> Map -> Map
+shake (x, y) dir map = if readMap map (x + dx) (y + dy) == (('X', False), Temp ('T', True)) then editMap map (x + dx) (y + dy) (('_', False), Temp ('T', True))
+                                                                                            else map
   where dy = snd (directionalValue dir)
         dx = fst (directionalValue dir)
+
 {- 
    PRECONS: 
    RETURNS: 
@@ -318,8 +344,8 @@ shake (x, y) dir map = if getType (x + dx, y + dy) map == ('T', True) then (edit
 -}
 getPlayerCoord :: Int -> Map -> Position
 getPlayerCoord _ ([], _)   = (-1, -1)
-getPlayerCoord y (m:ap, h) 
-  | x == -1   = getPlayerCoord (y + 1) (ap, h) 
+getPlayerCoord y (m:ap, h)
+  | x == -1   = getPlayerCoord (y + 1) (ap, h)
   | otherwise = (x `div` 2, y)
   where
   checkRow :: MapRow -> Int -> Int
@@ -336,8 +362,44 @@ getPlayerCoord y (m:ap, h)
    VARIANT: 
    SIDE EFFECTS: 
 -}
+moveEnemies :: Int -> Map -> Map -> Map
+moveEnemies y newMap ([],   h) = newMap
+moveEnemies y newMap (m:ap, h)
+  | y == h                     = newMap
+  | otherwise                  = moveEnemies (y + 1) (checkRow m 0 y newMap) (ap, h)
+  where
+  checkRow :: MapRow -> Int -> Int -> Map -> Map
+  checkRow []     _ _ map = map
+  checkRow (r:ow) x y map@(m:ap, h)
+    | x     == h     = map
+    | r     == empty = checkRow ow x       y map
+    | snd r == enemy = trace ("x: " ++ show x ++ " y: " ++ show y ++ " Dir: " ++ show (directionalValue (directionFrom (x, y) (getPlayerCoord 0 map)))) (checkRow ow (x + 1) y (move (x, y) (directionFrom (getPlayerCoord 0 map) (x, y)) map))
+    | otherwise      = checkRow ow (x + 1) y map
+  empty = ((' ', False), MH.Void)
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
 visionRange :: Int
 visionRange = 3
+
+
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+inRangeOf :: Position -> Position -> Bool 
+inRangeOf (x1, y1) (x2, y2) 
+  | -1 <= (x2 - x1) && (x2 - x1) <= 1 = -1 <= (y2 - y1) && (y2 - y1) <= 1
+  | otherwise = False
 
 {- 
    PRECONS: 

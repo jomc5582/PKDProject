@@ -127,7 +127,7 @@ printSection :: Map -> Int -> Int -> Int -> IO ()
 printSection map = printSectionAux map 0
 
 {- printSectionAux map acc x y radius
-   Auxillary function, meant to be ran from printSection
+   auxilary function, meant to be ran from printSection
    PRECONS: Any Valid non negative coordinates within the maps bounds and an accumulator value at 0.
    RETURNS: -
    EXAMPLE: (The printed representations are used instead of the list form of the maps)
@@ -166,7 +166,7 @@ editMap ([], h) _ _ _       = ([], h)
 editMap (rows, h) x y tile = editMapAux (rows, h) ([], h) 0 (2 * x + 1) y tile
 
 {- editMapAux oldMap newMap acc x y tile
-   Auxillary function meant to be ran from editMap
+   auxilary function meant to be ran from editMap
    PRECONS: A valid non negative coordinate within the maps bounds
             and an accumulator at ([], h) and an accumulator at 0
             where h is the height of the final map.
@@ -211,7 +211,7 @@ editMapTemp ([], h) _ _ _       = ([], h)
 editMapTemp (r:ows, h) x y temp = editMapTempAux (r:ows, h) ([], h) 0 (2 * x + 1) y temp
 
 {- editMapTempAux oldMap newMap aux x y temp
-   Auxillary function meant to be ran from editMapTemp.
+   auxilary function meant to be ran from editMapTemp.
    PRECONS: A valid non negative coordinate within the maps bounds and an accumulator 
    ([], h) where h is the height of the final map and an accumulator y which is initialized 0.
    RETURNS: The map with the Temporary value edited at the specified location.
