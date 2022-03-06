@@ -102,6 +102,7 @@ winsplash = do
    putStrLn " We hope you enjoyed your journey here!  " 
    putStrLn ""
    putStrLn " Do you want to play again? [y/n] "
+   putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 
