@@ -67,8 +67,9 @@ splash = do
   putStrLn "  /_______ \\|____(____  /\\___  >__|_ \\___  >__|  |___|  /  "
   putStrLn "          \\/          \\/     \\/     \\/    \\/           \\/   "
 
-rulesplash :: IO ()
-rulesplash = do
+ruleSplash :: IO ()
+ruleSplash = do
+   putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
    putStrLn " Welcome to The Legend of Zlackern! "
@@ -91,8 +92,8 @@ rulesplash = do
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 
-winsplash :: IO ()
-winsplash = do
+winSplash :: IO ()
+winSplash = do
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
    putStrLn " Congratulations, you won! " 
@@ -101,9 +102,8 @@ winsplash = do
    putStrLn ""
    putStrLn " We hope you enjoyed your journey here!  " 
    putStrLn ""
-   putStrLn " Do you want to play again? [y/n] "
-   putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
 
 
 --if the player chooses n, add string "Thanks for playing!" and then trigger the quit function

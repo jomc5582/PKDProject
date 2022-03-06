@@ -14,7 +14,7 @@ main :: IO ()
 main = do
   G.splash
   pause
-  G.rulesplash
+  G.ruleSplash
   pause
   initalize
 
@@ -37,9 +37,9 @@ initalize :: IO ()
 initalize = do
   mapFile <- readFile "Map.txt"
   let rows = lines mapFile
-  
+
   playAgainLoop rows -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
-  
+
 
 {- loop map
    PRECONS: 
@@ -55,7 +55,7 @@ playAgainLoop rows = do
 
   putStrLn "Do you want to play again? (y/n)"
   input <- getLine
-  
+
   if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop rows
 
 {- loop map
@@ -75,14 +75,13 @@ loop mapState@(map, score) = do
 
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine
-  putStrLn ""
 
-  if getWin map then 
-  if input == "quit" then putStrLn "Quitting..." else loop (newState input) 
+  if getWin map then winSplash else putStrLn ""
+  if input == "quit" then putStrLn "Quitting..." else loop (newState input)
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
         newState  = update mapState
-        scoreLine = "Score: " ++ (show score)
+        scoreLine = "Score: " ++ show score
 
 {- update map input
    PRECONS: 
