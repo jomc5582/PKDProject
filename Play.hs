@@ -55,7 +55,7 @@ loop mapState@(map, score) = do
   -- Printing the map
   G.printMap map (playerX + 1) playerY visionRange
   
-  putStrLn "What does the player wish to do?"
+  putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine 
   putStrLn ""
   
