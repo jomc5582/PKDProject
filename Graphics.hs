@@ -104,4 +104,21 @@ winSplash = do
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
 
---if the player chooses n, add string "Thanks for playing!" and then trigger the quit function
+menuSplash :: IO ()
+menuSplash = do 
+   putStrLn ""
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
+   putStrLn " - LEVELS - " 
+   putStrLn ""
+   putStrLn " Level 1 - Exploration / puzzle "
+   putStrLn ""
+   putStrLn " Level 2 - Boss "
+   putStrLn ""
+   putStrLn " Level 3 - NOT DONE"
+   putStrLn ""
+   putStrLn " Please enter the number of the level you wish to play. "
+   putStrLn ""
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
+

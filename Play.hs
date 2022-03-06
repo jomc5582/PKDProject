@@ -36,11 +36,14 @@ pause = do
 -}
 initalize :: IO ()
 initalize = do
-  mapFile <- readFile "level1.txt"
-  let rows = lines mapFile
-
-  playAgainLoop rows -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
-
+  level1 <- readFile "level1.txt"
+  let level1rows = lines level1
+  level2 <- readFile "level2.txt"
+  let level2rows = lines level2
+  
+  let levels = level1rows : level2rows : []
+  
+  playAgainLoop levels
 
 {- loop map
    PRECONS: 
@@ -49,15 +52,19 @@ initalize = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-playAgainLoop :: [String] -> IO ()
-playAgainLoop rows = do
+playAgainLoop :: [[String]] -> IO ()
+playAgainLoop levels = do
 
-  loop ((generateMap rows, 20), 0)
+  G.menuSplash
+  x <- getLine
+  let level = levels !! (read x - 1)
+
+  loop ((generateMap level, length level), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
 
   putStrLn "Do you want to play again? (y/n)"
   input <- getLine
 
-  if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop rows
+  if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop levels
 
 {- loop map
    PRECONS: 
@@ -73,10 +80,10 @@ loop mapState@(map, score) = do
   putStrLn ""
   -- Printing the map
   G.printMap map (playerX + 1) playerY visionRange
-
+  
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine
-
+  
   if getWin map then (if getWin map then winSplash else putStrLn "") else (if input == "quit" then putStrLn "Quitting..." else loop (newState input))
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
@@ -110,7 +117,7 @@ playerInput input map@((m:ap, h), p)
   | take 4 input == "push"  = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
   | take 3 input == "dig"   = (dig     (playerCoord (m:ap, h))                               (m:ap, h), p + 100)
   | take 5 input == "shake" = (shake   (playerCoord (m:ap, h)) (translateDir (drop 6 input)) (m:ap, h), p + 100)
-  | take 3 input == "hit"   = (hit     (playerCoord (m:ap, h)) (translateDir (drop 4 input)) (m:ap, h), p)
+  | take 3 input == "hit"   = (hit     (playerCoord (m:ap, h)) (translateDir (drop 4 input)) (m:ap, h), p + 10)
   | otherwise               = (                                                              (m:ap, h), p)
   where x = fst (playerCoord (m:ap, h))
         y = snd (playerCoord (m:ap, h))

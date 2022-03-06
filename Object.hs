@@ -211,6 +211,17 @@ enemy = Temp ('E', True)
 boulder :: MH.Temporary
 boulder = Temp ('O', True)
 
+{- boss
+   The representation of the boss in the game.
+   PRECONS: -
+   RETURNS: The value of a boss. Temp ('B', True)
+   EXAMPLE: boss = Temp ('B', True)
+   VARIANT: -
+   SIDE EFFECTS: -
+-}
+boss :: MH.Temporary
+boss = Temp ('B', True)
+
 {- treasure
    The representaion of treasure in the game.
    PRECONS: -
@@ -299,7 +310,7 @@ dig pos@(x, y) map = if fst (readMap map x y) == ('X', False) then digTile pos m
 digTile :: Position -> Map -> Map
 digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
 
-{- 
+{- hit
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
@@ -307,12 +318,13 @@ digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
    SIDE EFFECTS: 
 -}
 hit :: Position -> Direction -> Map -> Map
-hit pos@(x, y) dir map = if snd (readMap map (x + dx) (y + dy)) == enemy then hitTile (x + dx, y + dy) map else map
-  where value = directionalValue dir
+hit pos@(x, y) dir map = if tile == enemy || tile == boss then hitTile (x + dx, y + dy) map else map
+  where tile  = snd (readMap map (x + dx) (y + dy))
+        value = directionalValue dir
         dx    = fst value
         dy    = snd value
 
-{- 
+{- hitTile
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
