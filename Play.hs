@@ -12,7 +12,7 @@ import Graphics as G
 -}
 main :: IO ()
 main = do
-  G.splash 
+  G.splash
   pause
   G.rulesplash
   pause
@@ -22,7 +22,7 @@ pause :: IO ()
 pause = do
   putStrLn ""
   putStrLn "Press Enter to continue..."
-  wait <- getLine 
+  wait <- getLine
   putStrLn ""
 
 
@@ -36,10 +36,28 @@ pause = do
 initalize :: IO ()
 initalize = do
   mapFile <- readFile "Map.txt"
-  let rows = lines mapFile 
-  --MH.printMap (move (playerCoord ((generateMap rows), 20)) N ((generateMap rows), 20))
-  loop (((generateMap rows), 20), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
-  --loop ((editMap (newMap 5 5) 2 2 (('X', False), Temp ('Z', True))), 0)
+  let rows = lines mapFile
+  
+  playAgainLoop rows -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
+  
+
+{- loop map
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+playAgainLoop :: [String] -> IO ()
+playAgainLoop rows = do
+
+  loop ((generateMap rows, 20), 0)
+
+  putStrLn "Do you want to play again? (y/n)"
+  input <- getLine
+  
+  if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop rows
+
 {- loop map
    PRECONS: 
    RETURNS: 
@@ -54,19 +72,18 @@ loop mapState@(map, score) = do
   putStrLn ""
   -- Printing the map
   G.printMap map (playerX + 1) playerY visionRange
-  
+
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
-  input <- getLine 
+  input <- getLine
   putStrLn ""
-  
-  --let  -- (move (playerCoord map) (translateDir (drop 5 input)) map) -- ERROR IS IN THIS ONE
-  
-  if input == "quit" then putStrLn "Quitting..." else loop (newState input) -- (fst (playerInput input map), score + snd (playerInput input map))
+
+  if getWin map then 
+  if input == "quit" then putStrLn "Quitting..." else loop (newState input) 
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
         newState  = update mapState
         scoreLine = "Score: " ++ (show score)
-  
+
 {- update map input
    PRECONS: 
    RETURNS: 
@@ -75,7 +92,7 @@ loop mapState@(map, score) = do
    SIDE EFFECTS: 
 -}
 update :: (Map, Int) -> String -> (Map, Int)
-update mapState@(map, p) input = (moveEnemies 0 playerMap playerMap, playerScore)
+update mapState input = enemyTurn (playerMap, playerScore) playerMap
   where playerTurn  = playerInput input mapState
         playerMap   = fst playerTurn
         playerScore = snd playerTurn
@@ -108,7 +125,7 @@ playerInput input map@((m:ap, h), p)
 -}
 translateDir :: String -> O.Direction
 translateDir dir
-  | dir == "N"  = N 
+  | dir == "N"  = N
   | dir == "NE" = NE
   | dir == "E"  = E
   | dir == "SE" = SE
@@ -128,5 +145,21 @@ translateDir dir
 playerCoord :: Map -> Position
 playerCoord = O.getPlayerCoord 0
 
-enemyTurn :: Map -> Map -> Map
-enemyTurn = O.moveEnemies 0
+{- enemyTurn map mapAux
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+enemyTurn :: (Map, Int) -> Map -> (Map, Int)
+enemyTurn (map, p) mapAux = (enemyMove, p + enemyHits (getEnemies map 0) enemyMove)
+  where enemyMove         = O.moveEnemies 0 map mapAux
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}

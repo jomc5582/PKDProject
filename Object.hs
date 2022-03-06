@@ -387,7 +387,23 @@ moveEnemies y newMap (m:ap, h)
 visionRange :: Int
 visionRange = 3
 
-
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+getEnemies :: Map -> Int -> [Position]
+getEnemies ([], h)       y = []
+getEnemies map@(m:ap, h) y = checkRow m 0 y ++ getEnemies (ap, h) (y + 1)
+  where checkRow :: MapRow -> Int -> Int -> [Position]
+        checkRow []     x y = []
+        checkRow (r:ow) x y
+          | r     == empty = checkRow ow x y
+          | snd r == enemy = (x, y) : checkRow ow (x + 1) y
+          | otherwise      = checkRow ow (x + 1) y
+        empty = ((' ', False), MH.Void)
 
 {- 
    PRECONS: 
@@ -396,8 +412,41 @@ visionRange = 3
    VARIANT: 
    SIDE EFFECTS: 
 -}
-inRangeOf :: Position -> Position -> Bool 
-inRangeOf (x1, y1) (x2, y2) 
+getWin :: Map -> Bool
+getWin ([],   h) = False 
+getWin (m:ap, h)
+  | checkRow m = True
+  | otherwise  = getWin (ap, h)
+  where checkRow :: MapRow -> Bool
+        checkRow []             = False
+        checkRow (r:ow)
+          | r == (goal, player) = True
+          | otherwise           = checkRow ow
+        empty = ((' ', False), MH.Void)
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+enemyHits :: [Position] -> Map -> Int 
+enemyHits []     map = 0
+enemyHits (p:os) map
+  | p `inRangeOf` playerPos = -25 + enemyHits os map
+  | otherwise               =       enemyHits os map
+  where playerPos = getPlayerCoord 0 map
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+inRangeOf :: Position -> Position -> Bool
+inRangeOf (x1, y1) (x2, y2)
   | -1 <= (x2 - x1) && (x2 - x1) <= 1 = -1 <= (y2 - y1) && (y2 - y1) <= 1
   | otherwise = False
 
