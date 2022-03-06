@@ -93,12 +93,12 @@ update mapState input = playerInput input mapState
 playerInput :: String -> (Map, Int) -> (Map, Int)
 playerInput _     (([],   h), p) = (([],   h), p)
 playerInput input map@((m:ap, h), p)
-  | take 4 input == "move" = (move    (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p)
-  | take 3 input == "dig"  = dig (playerCoord (m:ap, h)) (m:ap, h)
-  -- | take 4 input == "push" = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
-  | take 4 input == "push" = (move (x, y + 1) (directionFrom (x, y + 1) (x, y)) (m:ap, h), p)
---  | take 5 input == "shake"     = 
-  | otherwise              = ((m:ap, h), p)
+  | take 4 input == "move"  = (move    (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p)
+  | take 4 input == "push"  = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
+  | take 3 input == "dig"   = (dig     (playerCoord (m:ap, h))                               (m:ap, h), p + 100)
+--  | take 5 input == "shake" = 
+--  | take 
+  | otherwise              = (                                                              (m:ap, h), p)
   where x = fst (playerCoord (m:ap, h))
         y = snd (playerCoord (m:ap, h))
 

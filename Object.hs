@@ -155,9 +155,9 @@ getType (x, y) map
 -} 
 directionFrom :: Position -> Position -> Direction
 directionFrom (x1, y1) (x2, y2)
-  | x1 < x2   = if y1 < y2 then NW else if y1 == y1 then W           else SW
-  | x1 == x2  = if y1 < y2 then N  else if y1 == y1 then Object.Void else S
-  | x1 > x2   = if y1 < y2 then NE else if y1 == y1 then E           else SE
+  | x1 < x2   = if y1 < y2 then SW else if y1 == y2 then W           else NW
+  | x1 == x2  = if y1 < y2 then S  else if y1 == y2 then Object.Void else N
+  | x1 > x2   = if y1 < y2 then SE else if y1 == y2 then E           else NE
   | otherwise = Object.Void
 
 {- clearTile pos map
@@ -240,7 +240,7 @@ goal = ('C', False)
    SIDE EFFECTS: -
 -}
 pushDir :: Direction -> Position -> Map -> Map
-pushDir dir (x, y) map = push (dx + x, dy + y) (x, y) map
+pushDir dir (x, y) map = move (dx + x, dy + y) dir map --push (dx + x, dy + y) (x, y) map
   where value = directionalValue dir
         dx = fst value
         dy = snd value
@@ -269,7 +269,7 @@ push pos playerPos map
    SIDE EFFECTS: - 
 -}
 pushAux :: Position -> Position -> Map -> Map
-pushAux pos playerPos = move pos (directionFrom pos playerPos)
+pushAux pos playerPos = move pos (directionFrom playerPos pos)
 
 {- dig pos map
    PRECONS: A valid position within the maps boundries.
@@ -278,8 +278,8 @@ pushAux pos playerPos = move pos (directionFrom pos playerPos)
    VARIANT: -
    SIDE EFFECTS: -
 -}
-dig :: Position -> Map -> (Map, Int)
-dig pos map = if getType pos map == ('X', False) then (clearTile pos map, 100) else (map, 0)
+dig :: Position -> Map -> Map
+dig pos map = if getType pos map == ('X', False) then clearTile pos map else map
 
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
