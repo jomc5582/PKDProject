@@ -2,7 +2,7 @@ import System.IO
 import MapHandling as MH
 import Object as O
 import Graphics as G
-
+import Debug.Trace
 
 {- main
    PRECONS: 
@@ -26,7 +26,6 @@ pause = do
   wait <- getLine
   putStrLn ""
 
-
 {- init
    PRECONS: 
    RETURNS: 
@@ -40,8 +39,10 @@ initalize = do
   let level1rows = lines level1
   level2 <- readFile "level2.txt"
   let level2rows = lines level2
-  
-  let levels = level1rows : level2rows : []
+  level3 <- readFile "level3.txt"
+  let level3rows = lines level3
+
+  let levels = level1rows : level2rows : level3rows : []
   
   playAgainLoop levels
 
@@ -54,10 +55,10 @@ initalize = do
 -}
 playAgainLoop :: [[String]] -> IO ()
 playAgainLoop levels = do
-
   G.menuSplash
+  putStrLn "Enter a number 1 to 3 to play respective level..."
   x <- getLine
-  let level = levels !! (read x - 1)
+  let level = levels !! (read (take 1 x) - 1)
 
   loop ((generateMap level, length level), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
 
@@ -66,7 +67,7 @@ playAgainLoop levels = do
 
   if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop levels
 
-{- loop map
+{- loop (map, score)
    PRECONS: 
    RETURNS: 
    EXAMPLE: 
@@ -84,7 +85,7 @@ loop mapState@(map, score) = do
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine
   
-  if getWin map then (if getWin map then winSplash else putStrLn "") else (if input == "quit" then putStrLn "Quitting..." else loop (newState input))
+  if getWin map then winSplash else (if input == "quit" then putStrLn "Quitting..." else loop (newState input))
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
         newState  = update mapState

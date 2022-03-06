@@ -211,16 +211,38 @@ enemy = Temp ('E', True)
 boulder :: MH.Temporary
 boulder = Temp ('O', True)
 
-{- boss
-   The representation of the boss in the game.
+{- boss1
+   The representation of the boss' first stage in the game.
    PRECONS: -
-   RETURNS: The value of a boss. Temp ('B', True)
-   EXAMPLE: boss = Temp ('B', True)
+   RETURNS: The value of the boss' first stage. Temp ('?', True)
+   EXAMPLE: boss1 = Temp ('?', True)
    VARIANT: -
    SIDE EFFECTS: -
 -}
-boss :: MH.Temporary
-boss = Temp ('B', True)
+boss1 :: MH.Temporary
+boss1 = Temp ('?', True)
+
+{- boss2
+   The representation of the boss' second stage in the game.
+   PRECONS: -
+   RETURNS: The value of the boss' second stage. Temp ('B', True)
+   EXAMPLE: boss2 = Temp ('B', True)
+   VARIANT: -
+   SIDE EFFECTS: -
+-}
+boss2 :: MH.Temporary
+boss2 = Temp ('B', True)
+
+{- boss3
+   The representation of the boss' final stage in the game.
+   PRECONS: -
+   RETURNS: The value of the boss' final stage. Temp ('F', True)
+   EXAMPLE: boss3 = Temp ('F', True)
+   VARIANT: -
+   SIDE EFFECTS: -
+-}
+boss3 :: MH.Temporary
+boss3 = Temp ('F', True)
 
 {- treasure
    The representaion of treasure in the game.
@@ -318,7 +340,10 @@ digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
    SIDE EFFECTS: 
 -}
 hit :: Position -> Direction -> Map -> Map
-hit pos@(x, y) dir map = if tile == enemy || tile == boss then hitTile (x + dx, y + dy) map else map
+hit pos@(x, y) dir map 
+  | tile == enemy = hitTile  (x + dx, y + dy) map 
+  | tile == boss1 = hitBoss1 (x + dx, y + dy) map 
+  | otherwise     = map
   where tile  = snd (readMap map (x + dx) (y + dy))
         value = directionalValue dir
         dx    = fst value
@@ -333,6 +358,16 @@ hit pos@(x, y) dir map = if tile == enemy || tile == boss then hitTile (x + dx, 
 -}
 hitTile :: Position -> Map -> Map
 hitTile (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
+
+{- hitTile
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+hitBoss1 :: Position -> Map -> Map
+hitBoss1 (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
 
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
@@ -385,7 +420,7 @@ moveEnemies y newMap (m:ap, h)
   checkRow (r:ow) x y map@(m:ap, h)
     | x     == h     = map
     | r     == empty = checkRow ow x       y map
-    | snd r == enemy = trace ("x: " ++ show x ++ " y: " ++ show y ++ " Dir: " ++ show (directionalValue (directionFrom (x, y) (getPlayerCoord 0 map)))) (checkRow ow (x + 1) y (move (x, y) (directionFrom (getPlayerCoord 0 map) (x, y)) map))
+    | snd r == enemy = {-trace ("x: " ++ show x ++ " y: " ++ show y ++ " Dir: " ++ show (directionalValue (directionFrom (x, y) (getPlayerCoord 0 map))))-} (checkRow ow (x + 1) y (move (x, y) (directionFrom (getPlayerCoord 0 map) (x, y)) map))
     | otherwise      = checkRow ow (x + 1) y map
   empty = ((' ', False), MH.Void)
 
@@ -435,6 +470,20 @@ getWin (m:ap, h)
           | r == (goal, player) = True
           | otherwise           = checkRow ow
         empty = ((' ', False), MH.Void)
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+summon :: Map -> Position -> Map 
+summon map pos@(x, y)
+  | not (collides (x - 1, y - 1) map) = editMapTemp map (x - 1) (y - 1) enemy
+  | not (collides (x - 1, y    ) map) = editMapTemp map (x - 1) y       enemy
+  | not (collides (x    , y - 1) map) = editMapTemp map x       (y - 1) enemy 
+  | otherwise                         = map
 
 {- 
    PRECONS: 
