@@ -11,12 +11,14 @@ import MapHandling as MH
       hasTemp,
       getCollision,
       tempToBase )
+import Test.HUnit
+
 type Position  = (Int, Int)
 
 {- Direction
    Represents a direction or lack of direction (Void)
 -}
-data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving Eq
+data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving (Eq, Show)
 
 {- movePos (x0, y0) (x1, y1) map
    Moves the temporary tile from the first position to the second. 
@@ -96,7 +98,7 @@ moveAux (x0, y0) dir map        = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd 
    Returns the coordinate values of an entered direction. Void returns (0, 0)
    PRECONS: Any valid direction
    RETURNS: the pair of coordinates representing the change in coordinates from moving said direction.
-   EXAMPLE: directionalValue N    == (-1, 0)
+   EXAMPLE: directionalValue N    == (0, -1)
             directionalValue Void == (0, 0)
    VARIANT: -
    SIDE EFFECTS: - 
@@ -694,3 +696,14 @@ inRangeOf :: Position -> Position -> Bool
 inRangeOf (x1, y1) (x2, y2)
   | -1 <= (x2 - x1) && (x2 - x1) <= 1 = -1 <= (y2 - y1) && (y2 - y1) <= 1
   | otherwise = False
+
+--------------------------------------------------------------
+
+-- testCases
+
+test1 = TestCase (assertEqual "directionalValue" (directionalValue N) (0, -1))
+test2 = TestCase (assertEqual "directionFrom" (directionFrom (1, 4) (5, 5)) NW)
+test3 = TestCase (assertEqual "inRangeOf" (inRangeOf (1, 2) (2, 3)) True)
+
+tests = TestList [TestLabel "test1: " test1, TestLabel "test2" test2, TestLabel "test3" test3]
+runTestsO = runTestTT tests

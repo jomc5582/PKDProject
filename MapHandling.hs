@@ -304,4 +304,9 @@ tempToBase (Temp (char, bool)) = (char, bool)
 
 -- testCases
 
---test1 = assertEqual "rowToString rowToString" rowToString [((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void)]
+test1 = TestCase (assertEqual "rowToString" (rowToString [((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void)]) (" _ _ _ "))
+test2 = TestCase (assertEqual "getCollision" (getCollision (('X', False), Temp ('Z', True))) True)
+test3 = TestCase (assertEqual "tempToBase" (tempToBase (Temp ('Z', True))) ('Z', True))
+
+tests = TestList [TestLabel "test1: " test1, TestLabel "test2" test2, TestLabel "test3" test3]
+runTestsMH = runTestTT tests
