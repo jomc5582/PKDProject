@@ -12,9 +12,9 @@ import Graphics as G
 -}
 main :: IO ()
 main = do
-  G.splash
+  G.splash 
   pause
-  G.ruleSplash
+  G.rulesplash
   pause
   initalize
 
@@ -22,8 +22,9 @@ pause :: IO ()
 pause = do
   putStrLn ""
   putStrLn "Press Enter to continue..."
-  wait <- getLine
+  wait <- getLine 
   putStrLn ""
+
 
 {- init
    PRECONS: 
@@ -34,17 +35,11 @@ pause = do
 -}
 initalize :: IO ()
 initalize = do
-  level1 <- readFile "level1.txt"
-  let level1rows = lines level1
-  level2 <- readFile "level2.txt"
-  let level2rows = lines level2
-  level3 <- readFile "level3.txt"
-  let level3rows = lines level3
-
-  let levels = level1rows : level2rows : level3rows : []
-  
-  playAgainLoop levels
-
+  mapFile <- readFile "Map.txt"
+  let rows = lines mapFile 
+  --MH.printMap (move (playerCoord ((generateMap rows), 20)) N ((generateMap rows), 20))
+  loop (((generateMap rows), 20), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "Map.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
+  --loop ((editMap (newMap 5 5) 2 2 (('X', False), Temp ('Z', True))), 0)
 {- loop map
    PRECONS: 
    RETURNS: 
@@ -52,29 +47,8 @@ initalize = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-playAgainLoop :: [[String]] -> IO ()
-playAgainLoop levels = do
-  G.menuSplash
-  putStrLn "Enter a number 1 to 3 to play respective level..."
-  x <- getLine
-  let level = levels !! (read (take 1 x) - 1)
-
-  loop ((generateMap level, length level), 0) 1 -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
-
-  putStrLn "Do you want to play again? (y/n)"
-  input <- getLine
-
-  if input == "n" then putStrLn "Thanks for playing!" else playAgainLoop levels
-
-{- loop (map, score)
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
-loop :: (Map, Int) -> Int -> IO ()
-loop mapState@(map, score) turn = do
+loop :: (Map, Int) -> IO ()
+loop mapState@(map, score) = do
   putStrLn ""
   putStrLn scoreLine
   putStrLn ""
@@ -82,14 +56,17 @@ loop mapState@(map, score) turn = do
   G.printMap map (playerX + 1) playerY visionRange
   
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
-  input <- getLine
+  input <- getLine 
+  putStrLn ""
   
-  if getWin map then winSplash else (if input == "quit" then putStrLn "Quitting..." else loop (newState input turn) (turn +1)) 
+  --let  -- (move (playerCoord map) (translateDir (drop 5 input)) map) -- ERROR IS IN THIS ONE
+  
+  if input == "quit" then putStrLn "Quitting..." else loop (newState input) -- (fst (playerInput input map), score + snd (playerInput input map))
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
-        newState  = update mapState 
-        scoreLine = "Score: " ++ show score
-
+        newState  = update mapState
+        scoreLine = "Score: " ++ (show score)
+  
 {- update map input
    PRECONS: 
    RETURNS: 
@@ -97,11 +74,14 @@ loop mapState@(map, score) turn = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-update :: (Map, Int) -> String -> Int -> (Map, Int)
-update mapState input turn = bossTurn (enemyTurn (playerMap, playerScore) playerMap) turn
-  where playerTurn  = playerInput input mapState
-        playerMap   = fst playerTurn
-        playerScore = snd playerTurn
+update :: (Map, Int) -> String -> (Map, Int)
+update mapState input = playerInput input mapState
+   {-
+   map1 <- playerInput input mapState
+   --map2 <- update Enemies
+   --timer?
+   return map1
+   -}
 
 {- playerInput input map
    PRECONS: 
@@ -116,9 +96,9 @@ playerInput input map@((m:ap, h), p)
   | take 4 input == "move"  = (move    (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p)
   | take 4 input == "push"  = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
   | take 3 input == "dig"   = (dig     (playerCoord (m:ap, h))                               (m:ap, h), p + 100)
-  | take 5 input == "shake" = (shake   (playerCoord (m:ap, h)) (translateDir (drop 6 input)) (m:ap, h), p + 100)
-  | take 3 input == "hit"   = (hit     (playerCoord (m:ap, h)) (translateDir (drop 4 input)) (m:ap, h), p + 10)
-  | otherwise               = (                                                              (m:ap, h), p)
+--  | take 5 input == "shake" = 
+--  | take 
+  | otherwise              = (                                                              (m:ap, h), p)
   where x = fst (playerCoord (m:ap, h))
         y = snd (playerCoord (m:ap, h))
 
@@ -131,7 +111,7 @@ playerInput input map@((m:ap, h), p)
 -}
 translateDir :: String -> O.Direction
 translateDir dir
-  | dir == "N"  = N
+  | dir == "N"  = N 
   | dir == "NE" = NE
   | dir == "E"  = E
   | dir == "SE" = SE
@@ -150,32 +130,3 @@ translateDir dir
 -}
 playerCoord :: Map -> Position
 playerCoord = O.getPlayerCoord 0
-
-{- enemyTurn map mapAux
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
-enemyTurn :: (Map, Int) -> Map -> (Map, Int)
-enemyTurn (map, p) mapAux = (enemyMove, p + enemyHits (getEnemies map 0) enemyMove)
-  where enemyMove         = O.moveEnemies 0 map mapAux
-
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
-bossTurn :: (Map, Int) -> Int -> (Map, Int)
-bossTurn (map, p) turn = (bossPhaseThree (bossPhaseTwo (bossPhaseOne map turn) turn) turn, p)
-
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
