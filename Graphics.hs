@@ -2,46 +2,45 @@ module Graphics where
 
 import MapHandling as MH
 
-{- MapInit width height
-   
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
-mapInit :: Int -> Int -> MH.Map
-mapInit = MH.newMap
-
 {- printMap xPos yPos radius
-
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+   Prints a part of the map like PrintSection from MapHandling.hs
+   PRECONS: Any valid Map and coordinates x and y within the map boundries.
+   RETURNS: -
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                         " _ _ _ _ _ "
+                         " _ P _ _ _ "          " P _ _ "
+            printSection " _ _ _ _ _ " 2 2 1 -> " _ _ _ "
+                         " _ _ _ _ _ "          " _ _ _ "
+                         " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad
 -}
 printMap :: MH.Map -> Int -> Int -> Int -> IO ()
 printMap = MH.printSection 
 
-{- printFullMap
-
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- printFullMap map
+   Prints the full map like PrintMap from MapHandling.hs
+   PRECONS: Any valid map.
+   RETURNS: -
+   EXAMPLE: printMap (newMap 5 5) =
+            " _ _ _ _ _ "
+            " _ _ _ _ _ "
+            " _ _ _ _ _ "
+            " _ _ _ _ _ "
+            " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad
 -}
 printFullMap :: MH.Map -> IO ()
 printFullMap = MH.printMap
 
 {- splash
-
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
 -}
 splash :: IO ()
 splash = do
@@ -66,6 +65,14 @@ splash = do
   putStrLn "          \\/          \\/     \\/     \\/    \\/           \\/   "
   putStrLn ""
 
+{- ruleSplash
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
+-}
 ruleSplash :: IO ()
 ruleSplash = do
    putStrLn ""
@@ -90,6 +97,14 @@ ruleSplash = do
    putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+{- winSplash
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
+-}
 winSplash :: IO ()
 winSplash = do
    splash
@@ -104,6 +119,14 @@ winSplash = do
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
    putStrLn ""
 
+{- menuSplash
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
+-}
 menuSplash :: IO ()
 menuSplash = do 
    putStrLn ""

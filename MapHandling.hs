@@ -2,7 +2,6 @@ module MapHandling where
 
 import Test.HUnit
 
---          (Visual, occupied)
 type Base = (Char, Bool)
 type Tile    = (Base, Temporary)
 type MapRow  = [Tile]
@@ -11,7 +10,7 @@ type MapPart = [MapRow]
 type Map = (MapPart, Int)
 
 {- Temporary Temp Base | Void
-   Represents a temporary (Movable) tile where if there is none is left as Void.
+   Represents a temporary (Movable) tile where if there is none; is left as Void.
 -}
 data Temporary = Temp Base | Void deriving Eq
 
@@ -42,26 +41,38 @@ newMap w h            = (newMapHeight (newMapWidth w) h, h)
         empty = (('_', False), Void)
         none  = ((' ', False), Void)
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- generateMap rows
+   Generates a map from a text file of four symbol combinations. The combinations must follow the pattern 
+   ABCD where A is the sign of the base tile, B is the bool of whether or not the base tile is occupied.
+   C is the sign of the tiles temporary value and D the bool of whether or not the temporary tile is occupied.
+   The representation of the temporary value Void is VV. Spaces get replaced with the empty tile: ((' ', False), Void)
+                                                         Example: _FVV == (('_', False), Void)
+                                                                  XFOT == (('X', False), Temp ('O', True)) 
+   PRECONS: A list of strings with valid four symbol combinations representing tiles.
+   RETURNS: The map part of a generated Map datatype
+   EXAMPLE: generateMap [" _FTT _FTT _FTT _FTT _FTT ", " _FTT _FVV _FVV _FVV _FTT ", " _FTT _FVV _FVV _FVV _FTT ", " _FTT _FVV _FVV _FVV _FTT ", " _FTT _FTT _FTT _FTT _FTT "] ->
+            " T T T T T "
+            " T _ _ _ T "
+            " T _ _ _ T " 
+            " T _ _ _ T "
+            " T T T T T "
+   VARIANT: length (r:ows)
+   SIDE EFFECTS: -
 -}
 generateMap :: [String] -> MapPart
 generateMap [] = []
 generateMap (r:ows) = generateRow r : generateMap ows
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- generateRow (r:ows)
+   generates a row of tiles from the four symbol combination system described in the generateMap function.
+   PRECONS: A String value of valid four symbol combinations.
+   RETURNS: A row of tiles
+   EXAMPLE: generateRow " _FTT _FVV _FVV _FVV _FTT " = [(('_', False), Temp ('T', True)), (('_', False), Void), (('_', False), Void), (('_', False), Void), (('_', False), Temp ('T', True))]
+   VARIANT: length (r:ows)
+   SIDE EFFECTS: -
 -}
 generateRow :: String -> MapRow
-generateRow []     = []
+generateRow [] = []
 generateRow (r:ow)
   | r == ' '  = empty : generateRow ow
   | otherwise = (generateRowAux (r:ow)) : (generateRow (drop 4 (r:ow)))
@@ -278,7 +289,12 @@ getCollision ((tile, col), Void)  = col
 getCollision (_, Temp (temp, tempCol)) = tempCol
 
 {- tempToBase temp
-
+   Takes a temporary value and turns it into the base equivalent so it may esier be compared.
+   PRECONS: Any valid Temp tile.
+   RETURNS: The respective Base tile value.
+   EXAMPLE: tempToBase Temp ('Z', True) == ('Z', True)
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 tempToBase :: Temporary -> Base
 tempToBase Void                = (' ', False)

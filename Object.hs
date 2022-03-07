@@ -2,7 +2,6 @@
 module Object where
 
 import MapHandling as MH
-import Debug.Trace
 
 type Position  = (Int, Int)
 
@@ -28,7 +27,7 @@ data Direction = N | NE | E | SE | S | SW | W | NW | Void deriving Eq
    SIDE EFFECTS: -
 -}
 movePos :: Position -> Position -> Map -> Map
-movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd oldPos)) x0 y0 MH.Void
+movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd (MH.readMap map x0 y0))) x0 y0 MH.Void--MH.editMapTemp (MH.editMapTemp map x1 y1 (snd oldPos)) x0 y0 MH.Void
   where oldPos = MH.readMap map x0 y0
 
 {- move (x0, y0) dir map
@@ -55,7 +54,7 @@ movePos (x0, y0) (x1, y1) map = MH.editMapTemp (MH.editMapTemp map x1 y1 (snd ol
 move :: Position -> Direction -> Map -> Map
 move pos dir map
   | collides ((fst pos + (fst value)), (snd pos + (snd value))) map = map
-  | otherwise                                                           = moveAux pos dir map
+  | otherwise                                                       = moveAux pos dir map
   where value = directionalValue dir
 
 {- moveAux (x0, y0) dir map
@@ -332,26 +331,35 @@ dig pos@(x, y) map = if fst (readMap map x y) == ('X', False) then digTile pos m
 digTile :: Position -> Map -> Map
 digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
 
-{- hit
-   PRECONS: 
-   RETURNS: 
+{- hit pos dir map
+   "Hits" the target and removes them from the map if they are an enemy and progresses the boss' stages.
+   PRECONS: A valid map and position direction combination within the bounds of the map.
+   RETURNS: The changed or unchanged map after hitting a target.
    EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+           hit (2, 2) SE  " _ _ Z _ _ " = " _ _ Z _ _ "
+                          " _ _ _ E _ "   " _ _ _ _ _ "
+                          " _ _ _ _ _ "   " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 hit :: Position -> Direction -> Map -> Map
 hit pos@(x, y) dir map 
   | tile == enemy = hitTile  (x + dx, y + dy) map 
   | tile == boss1 = hitBoss1 (x + dx, y + dy) map 
+  | tile == boss2 = hitBoss2 (x + dx, y + dy) map 
+  | tile == boss3 = hitTile  (x + dx, y + dy) map 
   | otherwise     = map
   where tile  = snd (readMap map (x + dx) (y + dy))
         value = directionalValue dir
         dx    = fst value
         dy    = snd value
 
-{- hitTile
-   PRECONS: 
-   RETURNS: 
+{- hitTile pos map
+   Edits the tile to remove whatever got hit.
+   PRECONS: A valid coordinate within the maps boundries.
+   RETURNS: the edited map
    EXAMPLE: 
    VARIANT: 
    SIDE EFFECTS: 
@@ -367,7 +375,17 @@ hitTile (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
    SIDE EFFECTS: 
 -}
 hitBoss1 :: Position -> Map -> Map
-hitBoss1 (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
+hitBoss1 (x, y) map = editMap map x y (fst(MH.readMap map x y), boss2)
+
+{- hitTile
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+hitBoss2 :: Position -> Map -> Map
+hitBoss2 (x, y) map = editMap map x y (fst(MH.readMap map x y), boss3)
 
 {- shake pos map
    PRECONS: A valid position within the maps boundries.
@@ -409,6 +427,26 @@ getPlayerCoord y (m:ap, h)
    VARIANT: 
    SIDE EFFECTS: 
 -}
+getCoord :: Int -> Temporary -> Map -> Position
+getCoord _ tile ([], _)   = (-1, -1)
+getCoord y tile (m:ap, h)
+  | x == -1   = getCoord (y + 1) tile (ap, h)
+  | otherwise = (x `div` 2, y)
+  where
+  checkRow :: MapRow -> Int -> Temporary  -> Int
+  checkRow []     _ tile = -1
+  checkRow (r:ow) w tile
+    | snd r == tile = w
+    | otherwise          = checkRow ow (w + 1) tile
+  x = checkRow m 0 tile
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
 moveEnemies :: Int -> Map -> Map -> Map
 moveEnemies y newMap ([],   h) = newMap
 moveEnemies y newMap (m:ap, h)
@@ -420,16 +458,17 @@ moveEnemies y newMap (m:ap, h)
   checkRow (r:ow) x y map@(m:ap, h)
     | x     == h     = map
     | r     == empty = checkRow ow x       y map
-    | snd r == enemy = {-trace ("x: " ++ show x ++ " y: " ++ show y ++ " Dir: " ++ show (directionalValue (directionFrom (x, y) (getPlayerCoord 0 map))))-} (checkRow ow (x + 1) y (move (x, y) (directionFrom (getPlayerCoord 0 map) (x, y)) map))
+    | snd r == enemy = (checkRow ow (x + 1) y (move (x, y) (directionFrom (getPlayerCoord 0 map) (x, y)) map))
     | otherwise      = checkRow ow (x + 1) y map
   empty = ((' ', False), MH.Void)
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- visionRange
+   for editing the vision range of the player.
+   PRECONS: -
+   RETURNS: 3
+   EXAMPLE: visionRange = 3
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 visionRange :: Int
 visionRange = 3
@@ -452,12 +491,12 @@ getEnemies map@(m:ap, h) y = checkRow m 0 y ++ getEnemies (ap, h) (y + 1)
           | otherwise      = checkRow ow (x + 1) y
         empty = ((' ', False), MH.Void)
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- getWin map
+   PRECONS: Any valid map.
+   RETURNS: True if the victory condition has been reached.
+   EXAMPLE: getWin ([[(('C', False), ('P', True))]], h) == True
+   VARIANT: length map
+   SIDE EFFECTS: -
 -}
 getWin :: Map -> Bool
 getWin ([],   h) = False 
@@ -471,12 +510,13 @@ getWin (m:ap, h)
           | otherwise           = checkRow ow
         empty = ((' ', False), MH.Void)
 
-{- 
-   PRECONS: 
-   RETURNS: 
+{- summon map pos
+   summons an enemy in one of three specified tiles.
+   PRECONS: Any valid position within the boundires of the map.
+   RETURNS: The map edited with the added enemy in one of the positions.
    EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 summon :: Map -> Position -> Map 
 summon map pos@(x, y)
@@ -492,6 +532,56 @@ summon map pos@(x, y)
    VARIANT: 
    SIDE EFFECTS: 
 -}
+bossPhaseOne :: Map -> Int -> Map
+bossPhaseOne map turn 
+  | bossPos == (-1, -1) = map
+  | turn `mod` 4 == 0   = summon map bossPos
+  | otherwise           = map
+  where bossPos = getCoord 0 (Temp ('?', True)) map
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+bossPhaseTwo :: Map -> Int -> Map
+bossPhaseTwo map turn
+  | bossPos == (-1, -1)       = map
+  | turn `mod` 4 == 0         = summon (summon map bossPos) bossPos
+  | not (bossPos == (-1, -1)) = move bossPos (directionFrom bossPos playerPos) map
+  | otherwise                 = map
+  where bossPos = getCoord 0 (Temp ('B', True)) map
+        playerPos = getPlayerCoord 0 map
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+bossPhaseThree :: Map -> Int -> Map
+bossPhaseThree map turn
+  | bossPos == (-1, -1) = map 
+  | turn `mod` 2 == 0   = summon (summon (summon map bossPos) bossPos) bossPos
+  | otherwise           = map 
+  where bossPos = getCoord 0 (Temp ('F', True)) map
+
+{- enemyHits (p:os) map
+   Goes through a list of coordinates and checks if any of them are adjecent of the player.
+   PRECONS: Any list of valid coordinates within the bounds of the map.
+   RETURNS: The amout of score lost from being hit by enemies.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                                      " _ _ _ _ _ "
+                                      " _ _ _ _ _ "
+           enemyHits [(2, 2), (2, 3)] " _ _ E _ _ " = -50
+                                      " _ _ E Z _ "
+                                      " _ _ _ _ _ "
+   VARIANT: length (p:os)
+   SIDE EFFECTS: -
+-}
 enemyHits :: [Position] -> Map -> Int 
 enemyHits []     map = 0
 enemyHits (p:os) map
@@ -499,22 +589,16 @@ enemyHits (p:os) map
   | otherwise               =       enemyHits os map
   where playerPos = getPlayerCoord 0 map
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- inRangeOf pos1 pos2
+   returns true if the two posititions are adjacent or equal.
+   PRECONS: Any two coordinates.
+   RETURNS: True if the two posititions are adjacent or equal otherwise false.
+   EXAMPLE: inRangeOf (1, 2)   (2, 3) == True
+            inRangeOf (-1, -1) (4, 1) == False
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 inRangeOf :: Position -> Position -> Bool
 inRangeOf (x1, y1) (x2, y2)
   | -1 <= (x2 - x1) && (x2 - x1) <= 1 = -1 <= (y2 - y1) && (y2 - y1) <= 1
   | otherwise = False
-
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
--}
