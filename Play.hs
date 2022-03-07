@@ -2,7 +2,6 @@ import System.IO
 import MapHandling as MH
 import Object as O
 import Graphics as G
-import Debug.Trace
 
 {- main
    PRECONS: 
@@ -60,7 +59,7 @@ playAgainLoop levels = do
   x <- getLine
   let level = levels !! (read (take 1 x) - 1)
 
-  loop ((generateMap level, length level), 0) -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
+  loop ((generateMap level, length level), 0) 1 -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
 
   putStrLn "Do you want to play again? (y/n)"
   input <- getLine
@@ -74,8 +73,8 @@ playAgainLoop levels = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-loop :: (Map, Int) -> IO ()
-loop mapState@(map, score) = do
+loop :: (Map, Int) -> Int -> IO ()
+loop mapState@(map, score) turn = do
   putStrLn ""
   putStrLn scoreLine
   putStrLn ""
@@ -85,10 +84,10 @@ loop mapState@(map, score) = do
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
   input <- getLine
   
-  if getWin map then winSplash else (if input == "quit" then putStrLn "Quitting..." else loop (newState input))
+  if getWin map then winSplash else (if input == "quit" then putStrLn "Quitting..." else loop (newState input turn) (turn +1)) 
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
-        newState  = update mapState
+        newState  = update mapState 
         scoreLine = "Score: " ++ show score
 
 {- update map input
@@ -98,8 +97,8 @@ loop mapState@(map, score) = do
    VARIANT: 
    SIDE EFFECTS: 
 -}
-update :: (Map, Int) -> String -> (Map, Int)
-update mapState input = enemyTurn (playerMap, playerScore) playerMap
+update :: (Map, Int) -> String -> Int -> (Map, Int)
+update mapState input turn = bossTurn (enemyTurn (playerMap, playerScore) playerMap) turn
   where playerTurn  = playerInput input mapState
         playerMap   = fst playerTurn
         playerScore = snd playerTurn
@@ -162,6 +161,16 @@ playerCoord = O.getPlayerCoord 0
 enemyTurn :: (Map, Int) -> Map -> (Map, Int)
 enemyTurn (map, p) mapAux = (enemyMove, p + enemyHits (getEnemies map 0) enemyMove)
   where enemyMove         = O.moveEnemies 0 map mapAux
+
+{- 
+   PRECONS: 
+   RETURNS: 
+   EXAMPLE: 
+   VARIANT: 
+   SIDE EFFECTS: 
+-}
+bossTurn :: (Map, Int) -> Int -> (Map, Int)
+bossTurn (map, p) turn = (bossPhaseThree (bossPhaseTwo (bossPhaseOne map turn) turn) turn, p)
 
 {- 
    PRECONS: 
