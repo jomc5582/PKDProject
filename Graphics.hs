@@ -1,6 +1,6 @@
 module Graphics where
 
-import MapHandling as MH
+import MapHandling as MH ( Map, printMap, printSection )
 
 {- printMap xPos yPos radius
    Prints a part of the map like PrintSection from MapHandling.hs
@@ -90,6 +90,42 @@ ruleSplash = do
    putStrLn " This is you: Z "
    putStrLn " These are enemies (watch out!): E "
    putStrLn " This is your goal: C "
+   putStrLn ""
+   putStrLn " On your adventure you have the chance to dig for treasure, which looks like this: X "
+   putStrLn ""
+   putStrLn " There are also trees (T) and boulders (O) around that you can interact with"
+   putStrLn ""
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+{- bossSplash
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
+-}
+
+bossSplash :: IO ()
+bossSplash = do
+   putStrLn ""
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
+   putStrLn " Welcome to The Legend of Zlackern! "
+   putStrLn ""
+   putStrLn " You are Zlackern, and your goal is to make it to your computer - you obviously"
+   putStrLn " have code that you need to finish because of your slacking"
+   putStrLn ""
+   putStrLn " In this game you move using cardinal directions " 
+   putStrLn ""
+   putStrLn " For example, if you want to move Northwest on the map, enter 'move NW' "
+   putStrLn ""
+   putStrLn " This is you: Z "
+   putStrLn " This is your goal: C "
+   putStrLn " These are enemies (watch out!): E "
+   putStrLn ""
+   putStrLn " This is a boss - a stronger enemy: B "
+   putStrLn " When a boss is almost dead and in its final form, it looks like this: F "
    putStrLn ""
    putStrLn " On your adventure you have the chance to dig for treasure, which looks like this: X "
    putStrLn ""
