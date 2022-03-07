@@ -1,6 +1,6 @@
 module Graphics where
 
-import MapHandling as MH
+import MapHandling as MH ( Map, printMap, printSection )
 
 {- printMap xPos yPos radius
    Prints a part of the map like PrintSection from MapHandling.hs

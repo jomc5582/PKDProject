@@ -1,7 +1,16 @@
 module Object where
 
 import MapHandling as MH
-
+    ( Temporary(..),
+      Map,
+      MapRow,
+      Base,
+      editMap,
+      editMapTemp,
+      readMap,
+      hasTemp,
+      getCollision,
+      tempToBase )
 type Position  = (Int, Int)
 
 {- Direction
