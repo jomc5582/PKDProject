@@ -114,12 +114,9 @@ loop mapState@(map, score) turn = do
   G.printMap map (playerX + 1) playerY visionRange
   
   putStrLn "What does the player wish to do? Eg. 'push SE', 'move W', 'hit N' or 'dig'"
-  input <- getLine 
-  putStrLn ""
+  input <- getLine
   
-  --let  -- (move (playerCoord map) (translateDir (drop 5 input)) map) -- ERROR IS IN THIS ONE
-  
-  if input == "quit" then putStrLn "Quitting..." else loop (newState input) -- (fst (playerInput input map), score + snd (playerInput input map))
+  if getWin map then winSplash else (if input == "quit" then putStrLn "Quitting..." else loop (newState input turn) (turn +1)) 
   where playerX   = fst (O.getPlayerCoord 0 map)
         playerY   = snd (O.getPlayerCoord 0 map)
         newState  = update mapState 
@@ -139,14 +136,11 @@ loop mapState@(map, score) turn = do
    VARIANT: -
    SIDE EFFECTS: -
 -}
-update :: (Map, Int) -> String -> (Map, Int)
-update mapState input = playerInput input mapState
-   {-
-   map1 <- playerInput input mapState
-   --map2 <- update Enemies
-   --timer?
-   return map1
-   -}
+update :: (Map, Int) -> String -> Int -> (Map, Int)
+update mapState input turn = bossTurn (enemyTurn (playerMap, playerScore) playerMap) turn
+  where playerTurn  = playerInput input mapState
+        playerMap   = fst playerTurn
+        playerScore = snd playerTurn
 
 {- playerInput input map
    The input is processed and interpeted on the map if it is one of the predefined.
@@ -167,9 +161,9 @@ playerInput input map@((m:ap, h), p)
   | take 4 input == "move"  = (move    (playerCoord (m:ap, h)) (translateDir (drop 5 input)) (m:ap, h), p)
   | take 4 input == "push"  = (pushDir (translateDir (drop 5 input)) (playerCoord (m:ap, h)) (m:ap, h), p)
   | take 3 input == "dig"   = (dig     (playerCoord (m:ap, h))                               (m:ap, h), p + 100)
---  | take 5 input == "shake" = 
---  | take 
-  | otherwise              = (                                                              (m:ap, h), p)
+  | take 5 input == "shake" = (shake   (playerCoord (m:ap, h)) (translateDir (drop 6 input)) (m:ap, h), p + 100)
+  | take 3 input == "hit"   = (hit     (playerCoord (m:ap, h)) (translateDir (drop 4 input)) (m:ap, h), p + 10)
+  | otherwise               = (                                                              (m:ap, h), p)
   where x = fst (playerCoord (m:ap, h))
         y = snd (playerCoord (m:ap, h))
 

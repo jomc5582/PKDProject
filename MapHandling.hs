@@ -301,3 +301,7 @@ tempToBase Void                = (' ', False)
 tempToBase (Temp (char, bool)) = (char, bool)
 
 --------------------------------------------------------------
+
+-- testCases
+
+--test1 = assertEqual "rowToString rowToString" rowToString [((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void), (('_', False), Void), ((' ', False), Void)]
