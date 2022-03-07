@@ -18,7 +18,7 @@ import Object as O
       Direction(..),
       Position )
 import Graphics as G
-    ( printMap, splash, ruleSplash, winSplash, menuSplash )
+    ( printMap, splash, ruleSplash, bossSplash, winSplash, menuSplash )
 
 {- main
    Prints vital information and starts the game initialization for the user.
@@ -32,8 +32,6 @@ import Graphics as G
 main :: IO ()
 main = do
   G.splash
-  pause
-  G.ruleSplash
   pause
   initalize
 
@@ -88,6 +86,10 @@ playAgainLoop levels = do
   x <- getLine
   let level = levels !! (read (take 1 x) - 1)
 
+  G.ruleSplash
+  if x == "2" then G.bossSplash else putStrLn ""
+  pause
+  
   loop ((generateMap level, length level), 0) 1 -- REQUIRES THE FIRST INTEGER VALUE TO BE THE SAME AS THE AMOUNT OF ROWS IN THE "level1.txt" FILE. THE SECOND ONE IS SCORE, STARTS AT 0
 
   putStrLn "Do you want to play again? (y/n)"

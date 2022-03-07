@@ -97,6 +97,23 @@ ruleSplash = do
    putStrLn ""
    putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+{- bossSplash
+   Prints a stylized splash to the screen.
+   PRECONS: -
+   RETURNS: -
+   EXAMPLE: -
+   VARIANT: -
+   SIDE EFFECTS: Prints to the screen using IO monad.
+-}
+bossSplash :: IO ()
+bossSplash = do
+   putStrLn ""
+   putStrLn " This level contains a boss! It has three stages, progress by hitting him! "
+   putStrLn " Also still watch out for the bad guys 'E', the boss summons more of them!"
+   putStrLn "  "
+   putStrLn " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   putStrLn ""
+
 {- winSplash
    Prints a stylized splash to the screen.
    PRECONS: -
