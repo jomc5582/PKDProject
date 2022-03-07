@@ -174,7 +174,7 @@ menuSplash = do
    putStrLn ""
    putStrLn " Level 2 - Boss "
    putStrLn ""
-   putStrLn " Level 3 - NOT DONE"
+   putStrLn " Level 3 - INCOMPLETE: only here for purposes of demonstration"
    putStrLn ""
    putStrLn " Please enter the number of the level you wish to play. "
    putStrLn ""
