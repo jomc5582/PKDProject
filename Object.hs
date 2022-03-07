@@ -262,11 +262,11 @@ boss3 = Temp ('F', True)
 treasure :: MH.Base
 treasure = ('X', False)
 
-{- treasure
-   The representaion of treasure in the game.
+{- goal
+   The representaion of the goal in the game.
    PRECONS: -
-   RETURNS: The value of treasure. ('X', False)
-   EXAMPLE: treasure = ('X', False)
+   RETURNS: The value of goal. ('C', False)
+   EXAMPLE: goal = ('C', False)
    VARIANT: -
    SIDE EFFECTS: -
 -}
@@ -277,7 +277,12 @@ goal = ('C', False)
    Checks if a tile is occupying the space and if it is of a type that is allowed to be pushed.
    PRECONS: A valid position within the maps boundries.
    RETURNS: The map with updated positions.
-   EXAMPLE: -
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                                " _ _ _ _ _ "    " _ _ _ _ _ "
+                                " Z O _ _ _ "    " Z _ O _ _ "
+               pushDir E (0, 1) " _ _ _ _ _ " -> " _ _ _ _ _ "
+                                " _ _ _ _ _ "    " _ _ _ _ _ "
+                                " _ _ _ _ _ "    " _ _ _ _ _ "
    VARIANT: -
    SIDE EFFECTS: -
 -}
@@ -291,7 +296,12 @@ pushDir dir (x, y) = move (dx + x, dy + y) dir
    Checks if a tile is occupying the space and if it is of a type that is allowed to be pushed.
    PRECONS: A valid position within the maps boundries.
    RETURNS: The map with updated positions.
-   EXAMPLE: -
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                                  " _ _ _ _ _ "    " _ _ _ _ _ "
+                                  " Z O _ _ _ "    " Z _ O _ _ "
+               push (1, 1) (0, 1) " _ _ _ _ _ " -> " _ _ _ _ _ "
+                                  " _ _ _ _ _ "    " _ _ _ _ _ "
+                                  " _ _ _ _ _ "    " _ _ _ _ _ "
    VARIANT: -
    SIDE EFFECTS: -
 -}
@@ -327,7 +337,7 @@ dig pos@(x, y) map = if fst (readMap map x y) == ('X', False) then digTile pos m
    clears a specified tile on the map.
    PRECONS: A valid coordinate within the boundries of the map.
    RETURNS: The map with the tile specified changed to (('_', False), Temp ('Z', True)))
-   EXAMPLE: 
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
                           " _ _ _ _ _ "   " _ _ _ _ _ "
                           " _ _ _ _ _ "   " _ _ _ _ _ "
            digTile (3, 3) " _ _ _ _ _ " = " _ _ _ _ _ "
@@ -343,7 +353,7 @@ digTile (x, y) map = editMap map x y (('_', False), Temp ('Z', True))
    "Hits" the target and removes them from the map if they are an enemy and progresses the boss' stages.
    PRECONS: A valid map and position direction combination within the bounds of the map.
    RETURNS: The changed or unchanged map after hitting a target.
-   EXAMPLE: 
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
                           " _ _ _ _ _ "   " _ _ _ _ _ "
                           " _ _ _ _ _ "   " _ _ _ _ _ "
            hit (2, 2) SE  " _ _ Z _ _ " = " _ _ Z _ _ "
@@ -368,37 +378,59 @@ hit pos@(x, y) dir map
    Edits the tile to remove whatever got hit.
    PRECONS: A valid coordinate within the maps boundries.
    RETURNS: the edited map
-   EXAMPLE: 
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                             " _ _ _ _ _ "   " _ _ _ _ _ "
+                             " _ _ _ _ _ "   " _ _ _ _ _ "
+           hitTile (2, 2) SE " _ _ Z _ _ " = " _ _ Z _ _ "
+                             " _ _ _ E _ "   " _ _ _ _ _ "
+                             " _ _ _ _ _ "   " _ _ _ _ _ "
    VARIANT: 
    SIDE EFFECTS: 
 -}
 hitTile :: Position -> Map -> Map
 hitTile (x, y) map = editMap map x y (fst(MH.readMap map x y), MH.Void)
 
-{- hitTile
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- hitBoss1 pos map
+   PRECONS: any valid coordinate within the boundies of the map
+   RETURNS: the map with the boss progressed to it's next stage.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+           hitBoss1 (2, 2) SE " _ _ Z _ _ " = " _ _ Z _ _ "
+                              " _ _ _ ? _ "   " _ _ _ B _ "
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 hitBoss1 :: Position -> Map -> Map
 hitBoss1 (x, y) map = editMap map x y (fst(MH.readMap map x y), boss2)
 
-{- hitTile
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- hitBoss2 pos map
+   PRECONS: any valid coordinate within the boundies of the map
+   RETURNS: the map with the boss progressed to it's next stage.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+           hitBoss2 (2, 2) SE " _ _ Z _ _ " = " _ _ Z _ _ "
+                              " _ _ _ B _ "   " _ _ _ F _ "
+                              " _ _ _ _ _ "   " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 hitBoss2 :: Position -> Map -> Map
 hitBoss2 (x, y) map = editMap map x y (fst(MH.readMap map x y), boss3)
 
-{- shake pos map
+{- shake pos dir map
    PRECONS: A valid position within the maps boundries.
-   RETURNS: The changed (or unchanged) map tupled with a score value.
-   EXAMPLE: 
+   RETURNS: The changed (or unchanged) map. Where The valid
+   (('X', False), Temp ('T', True)) tile is; it would be repalced with the 
+   (('_', False), Temp ('T', True)) tile.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                           " _ _ _ _ _ "   " _ _ _ _ _ "
+                           " _ _ _ _ _ "   " _ _ _ _ _ "
+           shake (2, 2) SE " _ _ Z _ _ " = " _ _ Z _ _ " (+ 100 points added via playerInput in Play.hs)
+                           " _ _ _ T _ "   " _ _ _ T _ "
+                           " _ _ _ _ _ "   " _ _ _ _ _ "
    VARIANT: -
    SIDE EFFECTS: -
 -}
@@ -408,12 +440,19 @@ shake (x, y) dir map = if readMap map (x + dx) (y + dy) == (('X', False), Temp (
   where dy = snd (directionalValue dir)
         dx = fst (directionalValue dir)
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- getPlayerCoord y map
+   checks every position on the map untill a player has been founds.
+   PRECONS: A valid map with the accumulator value y as 0 initialy.
+   RETURNS: The position of the player on the map. In case of no player
+   existing on the map, (-1, -1) will be returned.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                            " _ _ _ _ _ "   
+                            " _ _ _ _ _ "   
+           getPlayerCoord 0 " _ _ Z _ _ " = (2, 2)
+                            " _ _ _ _ _ "   
+                            " _ _ _ _ _ "
+   VARIANT: length map
+   SIDE EFFECTS: -
 -}
 getPlayerCoord :: Int -> Map -> Position
 getPlayerCoord _ ([], _)   = (-1, -1)
@@ -428,12 +467,19 @@ getPlayerCoord y (m:ap, h)
     | otherwise                 = checkRow ow (w + 1)
   x = checkRow m 0
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- getCoord y temp map
+   checks every position on the map untill the specified temp value has been founds.
+   PRECONS: A valid map with the accumulator value y as 0 initialy.
+   RETURNS: The position of the player on the map. In case of no player
+   existing on the map, (-1, -1) will be returned.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                                       " _ _ _ _ _ "   
+                                       " _ _ _ _ _ "   
+           getCoord Temp ('E', True) 0 " _ _ _ _ _ " = (4, 4)
+                                       " _ _ _ _ _ "   
+                                       " _ _ _ _ E "
+   VARIANT: length map
+   SIDE EFFECTS: -
 -}
 getCoord :: Int -> Temporary -> Map -> Position
 getCoord _ tile ([], _)   = (-1, -1)
@@ -448,12 +494,18 @@ getCoord y tile (m:ap, h)
     | otherwise          = checkRow ow (w + 1) tile
   x = checkRow m 0 tile
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- moveEnemies y newMap accMap
+   Moves each and every enemy on the map if there are any.
+   PRECONS: Any valid map and an accumulator y = 0
+   RETURNS: The map with all enemies moved if they are allowed to move.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                         " _ _ _ _ _ "   " _ _ _ _ _ "
+                         " _ _ _ _ _ "   " _ _ _ _ _ "
+           moveEnemies 0 " E _ Z _ _ " = " _ E Z _ _ " 
+                         " _ _ _ T _ "   " _ E E T _ "
+                         " E _ E _ _ "   " _ _ _ _ _ "
+   VARIANT: length map
+   SIDE EFFECTS: -
 -}
 moveEnemies :: Int -> Map -> Map -> Map
 moveEnemies y newMap ([],   h) = newMap
@@ -481,12 +533,18 @@ moveEnemies y newMap (m:ap, h)
 visionRange :: Int
 visionRange = 3
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- getEnemies map acc
+   returns a list of all positions where an enemy resides on a specific map.
+   PRECONS: Any valid map and an accumulator y = 0
+   RETURNS: The list of all positions of enemies.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                      " _ _ _ _ _ "   
+                      " _ _ E _ _ "   
+           getEnemies " _ E E _ _ " 0 = [(2, 1), (1, 2), (2, 2), (4, 4)]
+                      " _ _ _ _ _ "   
+                      " _ _ _ _ E "
+   VARIANT: length map
+   SIDE EFFECTS: -
 -}
 getEnemies :: Map -> Int -> [Position]
 getEnemies ([], h)       y = []
@@ -522,7 +580,12 @@ getWin (m:ap, h)
    summons an enemy in one of three specified tiles.
    PRECONS: Any valid position within the boundires of the map.
    RETURNS: The map edited with the added enemy in one of the positions.
-   EXAMPLE: 
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                  " _ _ _ _ _ "          " _ _ _ _ _ "
+                  " _ E _ _ _ "          " _ E _ _ _ "
+           summon " _ _ ? _ _ " (2, 2) = " _ E ? _ _ " 
+                  " _ _ _ _ _ "          " _ _ _ _ _ "
+                  " _ _ _ _ Z "          " _ _ _ _ Z "
    VARIANT: -
    SIDE EFFECTS: -
 -}
@@ -533,12 +596,19 @@ summon map pos@(x, y)
   | not (collides (x    , y - 1) map) = editMapTemp map x       (y - 1) enemy 
   | otherwise                         = map
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- bossPhaseOne map turn
+   Handles the bosses actions during it's turn in the first of it's phases.
+   PRECONS: Any valid map and any int turn.
+   RETURNS: The map where the boss has summoned an enemy if it is a
+            turn where it would do so and there is space.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                        " _ _ _ _ _ "     " _ _ _ _ _ "
+                        " _ E _ _ _ "     " _ E _ _ _ "
+           bossPhaseOne " _ _ ? _ _ " 4 = " _ E ? _ _ " 
+                        " _ _ _ _ _ "     " _ _ _ _ _ "
+                        " _ _ _ _ Z "     " _ _ _ _ Z "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 bossPhaseOne :: Map -> Int -> Map
 bossPhaseOne map turn 
@@ -547,12 +617,19 @@ bossPhaseOne map turn
   | otherwise           = map
   where bossPos = getCoord 0 (Temp ('?', True)) map
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- bossPhaseTwo map turn
+   Handles the bosses actions during it's turn in the second of it's phases.
+   PRECONS: Any valid map and any int turn.
+   RETURNS: The map where the boss has summoned two enemies if it is a
+            turn where it would do so and space exists.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                        " _ _ _ _ _ "     " _ _ _ _ _ "
+                        " _ _ Z _ _ "     " _ _ Z _ _ "
+           bossPhaseTwo " _ _ B _ _ " 3 = " _ _ _ _ _ " 
+                        " _ _ _ _ _ "     " _ _ B _ _ "
+                        " _ _ _ _ _ "     " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 bossPhaseTwo :: Map -> Int -> Map
 bossPhaseTwo map turn
@@ -563,12 +640,19 @@ bossPhaseTwo map turn
   where bossPos = getCoord 0 (Temp ('B', True)) map
         playerPos = getPlayerCoord 0 map
 
-{- 
-   PRECONS: 
-   RETURNS: 
-   EXAMPLE: 
-   VARIANT: 
-   SIDE EFFECTS: 
+{- bossPhaseThree map turn
+   Handles the bosses actions during it's turn in the third of it's phases.
+   PRECONS: Any valid map and any int turn.
+   RETURNS: The map where the boss has summoned three enemies if it is a
+            turn where it would do so and space exists.
+   EXAMPLE: (The printed representations are used instead of the list form of the maps)
+                          " _ _ Z _ _ "     " _ _ Z _ _ "
+                          " _ _ _ _ _ "     " _ E E _ _ "
+           bossPhaseThree " _ _ F _ _ " 4 = " _ E F _ _ " 
+                          " _ _ _ _ _ "     " _ _ _ _ _ "
+                          " _ _ _ _ _ "     " _ _ _ _ _ "
+   VARIANT: -
+   SIDE EFFECTS: -
 -}
 bossPhaseThree :: Map -> Int -> Map
 bossPhaseThree map turn
